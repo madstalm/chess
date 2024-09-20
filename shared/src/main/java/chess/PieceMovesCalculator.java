@@ -21,11 +21,10 @@ public class PieceMovesCalculator {
                 KnightMovesCalculator KNcalculator = new KnightMovesCalculator();
                 possibleMoves = KNcalculator.knightMoves(board, myPosition);
                 break;
-            /*
             case PAWN:
-                throw new RuntimeException("Not implemented");
+                PawnMovesCalculator Pcalculator = new PawnMovesCalculator();
+                possibleMoves = Pcalculator.pawnMoves(board, myPosition);
                 break;
-            */
             case QUEEN:
                 QueenMovesCalculator Qcalculator = new QueenMovesCalculator();
                 possibleMoves = Qcalculator.queenMoves(board, myPosition);
