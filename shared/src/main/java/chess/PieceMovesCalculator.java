@@ -12,21 +12,24 @@ public class PieceMovesCalculator {
             case BISHOP:
                 BishopMovesCalculator Bcalculator = new BishopMovesCalculator();
                 possibleMoves = Bcalculator.bishopMoves(board, myPosition);
-                break;
-            /* 
+                break; 
             case KING:
-                throw new RuntimeException("Not implemented");
+                KingMovesCalculator Kcalculator = new KingMovesCalculator();
+                possibleMoves = Kcalculator.kingMoves(board, myPosition);
                 break;  
             case KNIGHT:
-                throw new RuntimeException("Not implemented");
-                break; 
+                KnightMovesCalculator KNcalculator = new KnightMovesCalculator();
+                possibleMoves = KNcalculator.knightMoves(board, myPosition);
+                break;
+            /*
             case PAWN:
                 throw new RuntimeException("Not implemented");
                 break;
-            case QUEEN:
-                throw new RuntimeException("Not implemented");
-                break;
             */
+            case QUEEN:
+                QueenMovesCalculator Qcalculator = new QueenMovesCalculator();
+                possibleMoves = Qcalculator.queenMoves(board, myPosition);
+                break;
             case ROOK:
                 RookMovesCalculator Rcalculator = new RookMovesCalculator();
                 possibleMoves = Rcalculator.rookMoves(board, myPosition);
@@ -62,6 +65,7 @@ public class PieceMovesCalculator {
         }
     }
 
+    //returns true if there is a piece in the proposed position
     public static boolean spaceOccupied(ChessBoard board, ChessPosition proposed_position) {
         ChessPiece proposedFoe = board.getPiece(proposed_position);
         if (proposedFoe == null) {
