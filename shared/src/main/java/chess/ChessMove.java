@@ -39,7 +39,7 @@ public class ChessMove {
 
     @Override
     public String toString() { 
-        return "start{" + startPosition + "}, end{" + endPosition + "}, promotionPiece=" + promotionPiece;
+        return "[start{" + startPosition + "}, end{" + endPosition + "}]"; //, promotionPiece=" + promotionPiece;
     }
 
     /**

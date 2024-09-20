@@ -28,10 +28,19 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         if (outOfBounds) {
             return moves;
         }
-        moves = scanQuad1(board, next, originalPosition, moves);
-        boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-        if (friendOrFoe) {
+        boolean occupied = spaceOccupied(board, next);
+        if (occupied) {
+            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
+            if (friendOrFoe) {
+                moves.add(next);
+            }
+            else {
+                return moves;
+            }
+        }
+        else {
             moves.add(next);
+            moves = scanQuad1(board, next, originalPosition, moves);
         }
         return moves;
     }
@@ -45,10 +54,19 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         if (outOfBounds) {
             return moves;
         }
-        moves = scanQuad2(board, next, originalPosition, moves);
-        boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-        if (friendOrFoe) {
+        boolean occupied = spaceOccupied(board, next);
+        if (occupied) {
+            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
+            if (friendOrFoe) {
+                moves.add(next);
+            }
+            else {
+                return moves;
+            }
+        }
+        else {
             moves.add(next);
+            moves = scanQuad2(board, next, originalPosition, moves);
         }
         return moves;
     }
@@ -62,10 +80,19 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         if (outOfBounds) {
             return moves;
         }
-        moves = scanQuad3(board, next, originalPosition, moves);
-        boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-        if (friendOrFoe) {
+        boolean occupied = spaceOccupied(board, next);
+        if (occupied) {
+            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
+            if (friendOrFoe) {
+                moves.add(next);
+            }
+            else {
+                return moves;
+            }
+        }
+        else {
             moves.add(next);
+            moves = scanQuad3(board, next, originalPosition, moves);
         }
         return moves;
     }
@@ -79,10 +106,19 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         if (outOfBounds) {
             return moves;
         }
-        moves = scanQuad4(board, next, originalPosition, moves);
-        boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-        if (friendOrFoe) {
+        boolean occupied = spaceOccupied(board, next);
+        if (occupied) {
+            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
+            if (friendOrFoe) {
+                moves.add(next);
+            }
+            else {
+                return moves;
+            }
+        }
+        else {
             moves.add(next);
+            moves = scanQuad4(board, next, originalPosition, moves);
         }
         return moves;
     }

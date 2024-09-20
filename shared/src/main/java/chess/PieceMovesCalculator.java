@@ -46,19 +46,26 @@ public class PieceMovesCalculator {
         }
     }
 
+    //returns true if a piece is allowed to move there; square contains enemy
     public static boolean friendOrFoe(ChessBoard board, ChessPosition proposed_position, ChessPosition myPosition) {
         ChessPiece myPiece = board.getPiece(myPosition);
         ChessGame.TeamColor myTeam = myPiece.getTeamColor();
         ChessPiece proposedFoe = board.getPiece(proposed_position);
-        if (proposedFoe == null) {
-            return true;
-        }
         ChessGame.TeamColor proposedTeam = proposedFoe.getTeamColor();
         if (proposedTeam == myTeam) {
             return false;
         }
         else {
             return true;
+        }
+    }
+
+    public static boolean spaceOccupied(ChessBoard board, ChessPosition proposed_position) {
+        ChessPiece proposedFoe = board.getPiece(proposed_position);
+        if (proposedFoe == null) {
+            return false;
+        }
+        else { return true;
         }
     }
 }
