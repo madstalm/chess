@@ -10,8 +10,8 @@ public class PieceMovesCalculator {
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         switch (type) {
             case BISHOP:
-                BishopMovesCalculator calculator = new BishopMovesCalculator();
-                possibleMoves = calculator.bishopMoves(board, myPosition);
+                BishopMovesCalculator Bcalculator = new BishopMovesCalculator();
+                possibleMoves = Bcalculator.bishopMoves(board, myPosition);
                 break;
             /* 
             case KING:
@@ -26,10 +26,12 @@ public class PieceMovesCalculator {
             case QUEEN:
                 throw new RuntimeException("Not implemented");
                 break;
+            */
             case ROOK:
-                throw new RuntimeException("Not implemented");
+                RookMovesCalculator Rcalculator = new RookMovesCalculator();
+                possibleMoves = Rcalculator.rookMoves(board, myPosition);
                 break;
-            */ 
+             
         }
         return possibleMoves;
     }
