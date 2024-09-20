@@ -38,6 +38,7 @@ public class PieceMovesCalculator {
         return possibleMoves;
     }
 
+    //returns true if move is out of bounds
     public static boolean moveOutofBounds(ChessPosition proposed_position) {
         int row = proposed_position.getRow();
         int col = proposed_position.getColumn();

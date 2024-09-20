@@ -24,12 +24,14 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
         Collection<ChessMove> moves = new ArrayList<>();
         // move one space down
         ChessPosition move1 = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn());
-        if (!spaceOccupied(board, move1)) {
-            if (move1.getRow() == 1) {
-                moves.addAll(promotionMoves(myPosition, move1));
-            }
-            else {
-                moves.add(new ChessMove(myPosition, move1, null));
+        if (!(moveOutofBounds(move1))) {
+            if (!spaceOccupied(board, move1)) {
+                if (move1.getRow() == 1) {
+                    moves.addAll(promotionMoves(myPosition, move1));
+                }
+                else {
+                    moves.add(new ChessMove(myPosition, move1, null));
+                }
             }
         }
         // move two spaces if first turn
@@ -42,7 +44,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
         // capture spaces if occupied by enemy
         ChessPosition captureL = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() - 1);
         ChessPosition captureR = new ChessPosition(myPosition.getRow() - 1, myPosition.getColumn() + 1);
-        if (spaceOccupied(board, captureL)) {
+        if (!(moveOutofBounds(captureL)) && (spaceOccupied(board, captureL))) {
             if (friendOrFoe(board, captureL, myPosition)) {
                 if (captureL.getRow() == 1) {
                     moves.addAll(promotionMoves(myPosition, captureL));
@@ -52,7 +54,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 }
             }
         }
-        if (spaceOccupied(board, captureR)) {
+        if (!(moveOutofBounds(captureR)) && (spaceOccupied(board, captureR))) {
             if (friendOrFoe(board, captureR, myPosition)) {
                 if (captureL.getRow() == 1) {
                     moves.addAll(promotionMoves(myPosition, captureR));
@@ -69,12 +71,14 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
         Collection<ChessMove> moves = new ArrayList<>();
         // move one space up
         ChessPosition move1 = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn());
-        if (!spaceOccupied(board, move1)) {
-            if (move1.getRow() == 8) {
-                moves.addAll(promotionMoves(myPosition, move1));
-            }
-            else {
-                moves.add(new ChessMove(myPosition, move1, null));
+        if (!(moveOutofBounds(move1))) {
+            if (!spaceOccupied(board, move1)) {
+                if (move1.getRow() == 8) {
+                    moves.addAll(promotionMoves(myPosition, move1));
+                }
+                else {
+                    moves.add(new ChessMove(myPosition, move1, null));
+                }
             }
         }
         // move two spaces if first turn
@@ -87,7 +91,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
         // capture spaces if occupied by enemy
         ChessPosition captureL = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() - 1);
         ChessPosition captureR = new ChessPosition(myPosition.getRow() + 1, myPosition.getColumn() + 1);
-        if (spaceOccupied(board, captureL)) {
+        if (!(moveOutofBounds(captureL)) && (spaceOccupied(board, captureL))) {
             if (friendOrFoe(board, captureL, myPosition)) {
                 if (captureL.getRow() == 8) {
                     moves.addAll(promotionMoves(myPosition, captureL));
@@ -97,7 +101,7 @@ public class PawnMovesCalculator extends PieceMovesCalculator{
                 }
             }
         }
-        if (spaceOccupied(board, captureR)) {
+        if (!(moveOutofBounds(captureR)) && (spaceOccupied(board, captureR))) {
             if (friendOrFoe(board, captureR, myPosition)) {
                 if (captureL.getRow() == 8) {
                     moves.addAll(promotionMoves(myPosition, captureR));
