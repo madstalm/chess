@@ -1,6 +1,7 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,18 +11,32 @@ import java.util.Collection;
  */
 public class ChessGame {
     
-    private ChessBoard board = new ChessBoard(); //I have no idea if this class stores anything yet but it seems to work without this
-    private TeamColor team;
+    private ChessBoard game = new ChessBoard();
+    private TeamColor turn;
 
     public ChessGame() {
+        game.resetBoard();
+        turn = TeamColor.WHITE;
+    }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame that = (ChessGame) o;
+        return Objects.equals(game, that.game) && turn == that.turn; 
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(game, turn);
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return team;
+        return turn;
     }
 
     /**
@@ -30,6 +45,9 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
+        turn = team;
+        /*
+        //use this in a helper method
         switch (team) {
             case WHITE:
                 team = TeamColor.BLACK;
@@ -38,6 +56,7 @@ public class ChessGame {
                 team = TeamColor.WHITE;
                 break;
         }
+        */
     }
 
     /**
@@ -106,8 +125,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        team = TeamColor.WHITE;
-        board.resetBoard();
+        game = board;
     }
 
     /**
@@ -116,6 +134,6 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        return board;
+        return game;
     }
 }
