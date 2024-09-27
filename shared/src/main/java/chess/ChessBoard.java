@@ -14,18 +14,36 @@ public class ChessBoard {
         
     }
 
+    /**
+     * deep copy constructor for ChessBoard class
+     * 
+     * @param copy  the board you want a copy of
+     */
+    public ChessBoard(ChessBoard copy) {
+        squares = new ChessPiece[8][8]; //create a new squares array to hold copied pieces
+        for (int row = 1; row <= 8; ++row) {
+            for (int col = 1; col <= 8; ++col) {
+                if (copy.squares[row - 1][col - 1] != null) {
+                    ChessPosition position = new ChessPosition(row, col);
+                    squares[row - 1][col - 1] = new ChessPiece(copy.getPiece(position).getTeamColor(), copy.getPiece(position).getPieceType());
+                }
+            }
+        }
+    }
+
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessBoard that = (ChessBoard) o; 
-        return Arrays.deepEquals(squares, that.squares); 
+        if (this == o) return true; // Checks if the current object is compared to itself
+        if (o == null || getClass() != o.getClass()) return false; // Check if the passed object is of the correct type
+        ChessBoard that = (ChessBoard) o; // Typecast the object to ChessBoard
+        return Arrays.deepEquals(squares, that.squares); // Compare  the important fields
     }
 
     @Override
     public int hashCode() {
-        return Arrays.deepHashCode(squares);
+        return Arrays.deepHashCode(squares); // Generate hash code using relevant fields
     }
+
     @Override
     public String toString() { 
         return "|" + squares[7][0] + "|" +squares[7][1] + "|" +squares[7][2] + "|" +squares[7][3] + "|" +squares[7][4] + "|" +squares[7][5] + "|" +squares[7][6] + "|" +squares[7][7] + "|\n" +
@@ -43,6 +61,15 @@ public class ChessBoard {
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
         squares[position.getRow() - 1][position.getColumn() - 1] = piece;
+    }
+
+    /**
+     * Removes a chess piece from the chessboard and resets it to null
+     *
+     * @param position where to remove the piece from
+     */
+    public void removePiece(ChessPosition position) {
+        squares[position.getRow() - 1][position.getColumn() - 1] = null;
     }
 
     /**

@@ -2,6 +2,7 @@ package chess;
 
 import java.util.Collection;
 import java.util.Objects;
+import java.util.ArrayList;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -75,7 +76,14 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> potentialMoves = new ArrayList<>();
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece currentPiece = game.getPiece(startPosition);
+        potentialMoves.addAll(currentPiece.pieceMoves(game, startPosition));
+        for (ChessMove move : potentialMoves) {
+
+        }
+        return validMoves;
     }
 
     /**
@@ -83,9 +91,21 @@ public class ChessGame {
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
+     * A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger, or if it’s not the corresponding team's turn.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        ChessPiece myPiece = game.getPiece(move.getStartPosition());
+        if (myPiece.getTeamColor() == getTeamTurn()) {
+            if 
+            ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+            if (promotionPiece != null) {
+            
+            }
+            else {
+    
+            }
+        }
+        else { throw new InvalidMoveException("Attempted move when not on turn"); }
     }
 
     /**
