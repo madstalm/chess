@@ -47,17 +47,23 @@ public class ChessGame {
      */
     public void setTeamTurn(TeamColor team) {
         turn = team;
-        /*
-        //use this in a helper method
+    }
+
+
+    /**
+     * uses setTeamTurn() to change class variable turn to the opposite of what is was set to
+     *
+     * @param team the team whose turn it is
+     */
+    private void changeTurn(TeamColor team) {
         switch (team) {
             case WHITE:
-                team = TeamColor.BLACK;
+                setTeamTurn(TeamColor.BLACK);
                 break;
             case BLACK:
-                team = TeamColor.WHITE;
+                setTeamTurn(TeamColor.WHITE);
                 break;
         }
-        */
     }
 
     /**
@@ -80,11 +86,20 @@ public class ChessGame {
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece currentPiece = game.getPiece(startPosition);
         potentialMoves.addAll(currentPiece.pieceMoves(game, startPosition));
+        ChessBoard ogBoard = getBoard();
         for (ChessMove move : potentialMoves) {
-
+            ChessBoard copyBoard = new ChessBoard(game);
+            setBoard(copyBoard);
+            tryMove(move);
+            if (!isInCheck(currentPiece.getTeamColor())) {
+                validMoves.add(move);
+            }
+            setBoard(ogBoard);
         }
         return validMoves;
     }
+
+
 
     /**
      * Makes a move in a chess game
@@ -95,18 +110,46 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece myPiece = game.getPiece(move.getStartPosition());
-        if (myPiece.getTeamColor() == getTeamTurn()) {
-            if 
-            ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
-            if (promotionPiece != null) {
-            
+        if (myPiece.getTeamColor() == getTeamTurn()) { //throws an error if the move is made on the wrong turn
+            if (validMoves(move.getStartPosition()).contains(move)) { //throws an error if the move isn't in validMoves
+                game.removePiece(move.getEndPosition());
+                ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+                if (promotionPiece != null) { //case for promoting pawns: a promotionPiece exists
+                    game.addPiece(move.getEndPosition(), new ChessPiece(getTeamTurn(), promotionPiece));
+                }
+                else {
+                    game.addPiece(move.getEndPosition(), myPiece);
+                }
+                game.removePiece(move.getStartPosition());
+                changeTurn(myPiece.getTeamColor());
             }
             else {
-    
+                throw new InvalidMoveException("King put in danger");
             }
         }
         else { throw new InvalidMoveException("Attempted move when not on turn"); }
     }
+
+    /**
+     * 
+     * like makeMove, but you pay for your mistakes after, not before
+     * 
+     * @param move  the move you are trying to make
+     * @param board the board (presumably a copy) that you are trying to make it on
+     */
+    private void tryMove(ChessMove move) {
+        ChessPiece myPiece = game.getPiece(move.getStartPosition());
+        game.removePiece(move.getEndPosition());
+        ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+        if (promotionPiece != null) { //case for promoting pawns: a promotionPiece exists
+            game.addPiece(move.getEndPosition(), new ChessPiece(getTeamTurn(), promotionPiece));
+        }
+        else {
+            game.addPiece(move.getEndPosition(), myPiece);
+        }
+        game.removePiece(move.getStartPosition());
+    }
+
 
     /**
      * Determines if the given team is in check
@@ -115,7 +158,18 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        boolean checked = false;
+        ChessPosition myKing = findKing(teamColor);
+        Collection<ChessMove> opponentMoves = new ArrayList<>();
+        for (ChessPosition position : findOpponents(teamColor)) {
+            opponentMoves.addAll(game.getPiece(position).pieceMoves(game, position));
+        }
+        for (ChessMove move : opponentMoves) {
+            if (move.getEndPosition() == myKing) {
+                checked = true;
+            }
+        }
+        return checked;
     }
 
     /**
@@ -155,5 +209,59 @@ public class ChessGame {
      */
     public ChessBoard getBoard() {
         return game;
+    }
+
+    /**
+     * returns the ChessPosition of the king belonging to the team specified by teamColor
+     * 
+     * @param teamColor Specifies the team whose king we are looking for 
+     * @return          ChessPosition where teamColor's king is (or null if it doesn't find the king for some stupid reason)
+     */
+    private ChessPosition findKing(TeamColor teamColor) {
+        ChessPiece kingPiece = new ChessPiece(teamColor, ChessPiece.PieceType.KING);
+        for (int row = 1; row <= 8; ++row) {
+            for (int col = 1; col <= 8; ++col) {
+                ChessPosition scan = new ChessPosition(row, col);
+                ChessPiece pieceAtScan = game.getPiece(scan);
+                if (pieceAtScan != null) {
+                    if (pieceAtScan.equals(kingPiece)) {
+                        return scan;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+
+    /**
+     * returns a collection of your opponents positions
+     * 
+     * @param teamColor your teams color
+     * @return the ChessPositions of your opponents pieces
+     */
+    private Collection<ChessPosition> findOpponents(TeamColor teamColor) {
+        Collection<ChessPosition> opponents = new ArrayList<>();
+        TeamColor opponentColor = null;
+        switch (teamColor) {
+            case WHITE:
+                opponentColor = TeamColor.BLACK;
+                break;
+            case BLACK:
+                opponentColor = TeamColor.WHITE;
+                break;
+        }
+        for (int row = 1; row <= 8; ++row) {
+            for (int col = 1; col <= 8; ++col) {
+                ChessPosition scan = new ChessPosition(row, col);
+                ChessPiece pieceAtScan = game.getPiece(scan);
+                if (pieceAtScan != null) {
+                    if (pieceAtScan.getTeamColor() == opponentColor) {
+                        opponents.add(scan);
+                    }
+                }
+            }
+        }
+        return opponents;
     }
 }
