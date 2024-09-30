@@ -113,24 +113,27 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece myPiece = game.getPiece(move.getStartPosition());
-        if (myPiece.getTeamColor() == getTeamTurn()) { //throws an error if the move is made on the wrong turn
-            if (validMoves(move.getStartPosition()).contains(move)) { //throws an error if the move isn't in validMoves
-                game.removePiece(move.getEndPosition());
-                ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
-                if (promotionPiece != null) { //case for promoting pawns: a promotionPiece exists
-                    game.addPiece(move.getEndPosition(), new ChessPiece(getTeamTurn(), promotionPiece));
+        if (myPiece != null) {
+            if (myPiece.getTeamColor() == getTeamTurn()) { //throws an error if the move is made on the wrong turn
+                if (validMoves(move.getStartPosition()).contains(move)) { //throws an error if the move isn't in validMoves
+                    game.removePiece(move.getEndPosition());
+                    ChessPiece.PieceType promotionPiece = move.getPromotionPiece();
+                    if (promotionPiece != null) { //case for promoting pawns: a promotionPiece exists
+                        game.addPiece(move.getEndPosition(), new ChessPiece(getTeamTurn(), promotionPiece));
+                    }
+                    else {
+                        game.addPiece(move.getEndPosition(), myPiece);
+                    }
+                    game.removePiece(move.getStartPosition());
+                    changeTurn(myPiece.getTeamColor());
                 }
                 else {
-                    game.addPiece(move.getEndPosition(), myPiece);
+                    throw new InvalidMoveException("King put in danger");
                 }
-                game.removePiece(move.getStartPosition());
-                changeTurn(myPiece.getTeamColor());
             }
-            else {
-                throw new InvalidMoveException("King put in danger");
-            }
+            else { throw new InvalidMoveException("Attempted move when not on turn"); }
         }
-        else { throw new InvalidMoveException("Attempted move when not on turn"); }
+    else { throw new InvalidMoveException("No piece at start position"); }
     }
 
     /**
@@ -169,7 +172,7 @@ public class ChessGame {
             opponentMoves.addAll(game.getPiece(position).pieceMoves(game, position));
         }
         for (ChessMove move : opponentMoves) {
-            if (move.getEndPosition().equals(myKing)) {
+            if (move.getEndPosition().equals(myKing)) { //use .equals()!!!! not ==
                 checked = true;
             }
         }
