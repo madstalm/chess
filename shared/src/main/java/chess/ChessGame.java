@@ -127,13 +127,11 @@ public class ChessGame {
                     game.removePiece(move.getStartPosition());
                     changeTurn(myPiece.getTeamColor());
                 }
-                else {
-                    throw new InvalidMoveException("King put in danger");
-                }
+                else { throw new InvalidMoveException("King put in danger"); }
             }
             else { throw new InvalidMoveException("Attempted move when not on turn"); }
         }
-    else { throw new InvalidMoveException("No piece at start position"); }
+        else { throw new InvalidMoveException("No piece at start position"); }
     }
 
     /**
