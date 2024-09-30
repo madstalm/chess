@@ -186,7 +186,17 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        if (isInCheck(teamColor)) {
+            Collection<ChessMove> okMoves = new ArrayList<>();
+            Collection<ChessPosition> myPieces = findTeam(teamColor);
+            for (ChessPosition piece : myPieces) {
+                okMoves.addAll(validMoves(piece));
+            }
+            if (okMoves.size() == 0) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -197,7 +207,15 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> okMoves = new ArrayList<>();
+        Collection<ChessPosition> myPieces = findTeam(teamColor);
+        for (ChessPosition piece : myPieces) {
+            okMoves.addAll(validMoves(piece));
+        }
+        if (okMoves.size() == 0) {
+            return true;
+        };
+        return false;
     }
 
     /**
@@ -270,5 +288,28 @@ public class ChessGame {
             }
         }
         return opponents;
+    }
+
+
+    /**
+     * returns a collection of your pieces positions
+     * 
+     * @param teamColor the color whose pieces you are locating
+     * @return the positions of teamColor's pieces
+     */
+    private Collection<ChessPosition> findTeam(TeamColor teamColor) {
+        Collection<ChessPosition> teammates = new ArrayList<>();
+        for (int row = 1; row <= 8; ++row) {
+            for (int col = 1; col <= 8; ++col) {
+                ChessPosition scan = new ChessPosition(row, col);
+                ChessPiece pieceAtScan = game.getPiece(scan);
+                if (pieceAtScan != null) {
+                    if (pieceAtScan.getTeamColor() == teamColor) {
+                        teammates.add(scan);
+                    }
+                }
+            }
+        }
+        return teammates;
     }
 }
