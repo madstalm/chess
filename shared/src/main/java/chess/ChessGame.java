@@ -207,6 +207,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
+        if (isInCheckmate(teamColor)) { return false; }
         Collection<ChessMove> okMoves = new ArrayList<>();
         Collection<ChessPosition> myPieces = findTeam(teamColor);
         for (ChessPosition piece : myPieces) {
