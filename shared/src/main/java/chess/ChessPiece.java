@@ -31,29 +31,35 @@ public class ChessPiece {
     public int hashCode() {
         return Objects.hash(type, pieceColor);
     }
+
     @Override
     public String toString() { 
         String piece = "";
         switch (type) {
             case BISHOP:
-                piece = "B";
+                if (pieceColor == ChessGame.TeamColor.WHITE) { piece = "B"; }
+                else { piece = "b";}
                 break; 
             case KING:
-                piece = "K";
+            if (pieceColor == ChessGame.TeamColor.WHITE) { piece = "K"; }
+            else { piece = "k";}
                 break;  
             case KNIGHT:
-                piece = "N";
+            if (pieceColor == ChessGame.TeamColor.WHITE) { piece = "N"; }
+            else { piece = "n";}
                 break;
             case PAWN:
-                piece = "P";
+            if (pieceColor == ChessGame.TeamColor.WHITE) { piece = "P"; }
+            else { piece = "p";}
                 break;
             case QUEEN:
-                piece = "Q";
+            if (pieceColor == ChessGame.TeamColor.WHITE) { piece = "Q"; }
+            else { piece = "q";}
                 break;
             case ROOK:
-                piece = "R";
-                break;
-             
+            if (pieceColor == ChessGame.TeamColor.WHITE) { piece = "R"; }
+            else { piece = "r";}
+                break;             
         };
         return piece;
     }
