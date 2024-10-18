@@ -26,7 +26,11 @@ public class MemoryGameDAO {
         return games.values();
     }
 
-    ublic void deleteGame(int gameId) {
+    public void updateGameData(GameData game) {
+        games.put(game.gameID(), game);
+    }
+
+    public void deleteGame(int gameId) {
         games.remove(gameId);
     }
 
