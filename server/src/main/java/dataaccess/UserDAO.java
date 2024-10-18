@@ -1,5 +1,5 @@
 package dataaccess;
 
-public class UserDAO {
+public class UserDAO extends DataAccess{
 
 }

@@ -1,5 +1,5 @@
 package dataaccess;
 
-public class GameDAO {
+public class GameDAO extends DataAccess{
 
 }
