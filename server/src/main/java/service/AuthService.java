@@ -4,6 +4,7 @@ import dataaccess.AuthDAO;
 import model.AuthData;
 import model.UserData;
 import dataaccess.DataAccessException;
+import dataaccess.InvalidInputException;
 
 import java.util.Collection;
 import java.util.Random;
@@ -16,6 +17,9 @@ public class AuthService {
     }
 
     public AuthData createAuth(UserData userData) throws Exception {
+        if ((userData.username() == null) || (userData.username().isEmpty())) {
+            throw new InvalidInputException("Error: no username passed");
+        }
         String username = userData.username();
         String authToken = createToken(username);
         AuthData authData = new AuthData(authToken, username);

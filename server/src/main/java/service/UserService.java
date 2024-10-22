@@ -1,13 +1,14 @@
 package service;
 
 import dataaccess.UserDAO;
-import dataaccess.AuthDAO;
 import model.AuthData;
 import model.UserData;
 import dataaccess.DataAccessException;
+import dataaccess.InvalidInputException;
 import dataaccess.AlreadyTakenException;
 
 import java.util.Collection;
+import java.util.regex.Pattern;
 
 public class UserService {
     private final UserDAO dataAccess;
@@ -23,8 +24,14 @@ public class UserService {
         3. get authentication info for the new user
         */
         String username = user.username();
+        if ((username == null) || (username.isEmpty()) || (user.password() == null) || (user.password().isEmpty())) {
+            throw new Exception("Error: bad request");
+        }
         if (dataAccess.getUserData(username) != null) {
             throw new AlreadyTakenException("Error: already taken");
+        }
+        if (invalidEmail(user.email())) {
+            throw new InvalidInputException("Error: invalid email");
         }
         dataAccess.addUserData(user);
         return user;
@@ -36,6 +43,15 @@ public class UserService {
 
     public void clear() throws DataAccessException {
         dataAccess.deleteAllUsers();
+    }
+
+    private boolean invalidEmail(String email) {
+        String emailREGEX = "^[a-zA-Z0-9_%+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$";
+        Pattern pattern = Pattern.compile(emailREGEX);
+        if (email == null || email.isEmpty()) {
+            return true;
+        }
+        return !pattern.matcher(email).matches();
     }
     
 }
