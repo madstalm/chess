@@ -6,6 +6,7 @@ import model.UserData;
 import dataaccess.DataAccessException;
 import dataaccess.InvalidInputException;
 import dataaccess.AlreadyTakenException;
+import dataaccess.UnauthorizedException;
 
 import java.util.Collection;
 import java.util.regex.Pattern;
@@ -37,7 +38,22 @@ public class UserService {
         return user;
     }
 
-    //public AuthData login(UserData user) {}
+    public UserData checkLogin(UserData user) throws Exception {
+        String username = user.username();
+        String password = user.password();
+        if ((username == null) || (username.isEmpty()) || (password == null) || (password.isEmpty())) {
+            throw new InvalidInputException("Error: bad request");
+        }
+        UserData checkUser = dataAccess.getUserData(username);
+        if (checkUser == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        String checkPassword = checkUser.password();
+        if (checkPassword != password) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        return checkUser;
+    }
 
 	public void logout(AuthData auth) {}
 

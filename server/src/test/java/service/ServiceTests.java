@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test;
 
 import dataaccess.DataAccessException;
 import dataaccess.InvalidInputException;
+import dataaccess.UnauthorizedException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -36,7 +37,10 @@ public class ServiceTests {
     }
 
     @BeforeEach
-    public void setupService() {
+    public void setupService() throws Exception {
+        authDAO.deleteAllAuthData();
+        gameDAO.deleteAllGames();
+        userDAO.deleteAllUsers();
         authService = new AuthService(authDAO);
         gameService = new GameService(gameDAO);
         userService = new UserService(userDAO);
@@ -72,7 +76,7 @@ public class ServiceTests {
     @Test
     @DisplayName("createAuth() positive")
     public void createAuthService() throws Exception {
-        UserData user = new UserData("bob", "theBuilder", "hecanfix.it");
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
         AuthData authorization = authService.createAuth(user);
         Assertions.assertNotNull(authorization.authToken(), 
                 "Response did not return authentication String");
@@ -86,5 +90,25 @@ public class ServiceTests {
             () -> authService.createAuth(user));
     }
 
-    
+    @Test
+    @DisplayName("checkLogin() positive")
+    public void checkLoginService() throws Exception {
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        userDAO.addUserData(user);
+        UserData loginUser = new UserData("bob", "theBuilder", null);
+        UserData checked = userService.checkLogin(loginUser);
+        Assertions.assertEquals(user.password(), checked.password(), 
+                "did not return the same user");
+    }
+
+    @Test
+    @DisplayName("createAuth() negative")
+    public void checkLoginService_N() throws Exception {
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        userDAO.addUserData(user);
+        UserData loginUser = new UserData("bob", "thebuilder", null);
+        UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
+            () -> userService.checkLogin(loginUser));
+    }
+
 }
