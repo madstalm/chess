@@ -102,13 +102,36 @@ public class ServiceTests {
     }
 
     @Test
-    @DisplayName("createAuth() negative")
+    @DisplayName("checkLogin() negative")
     public void checkLoginService_N() throws Exception {
         UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
         userDAO.addUserData(user);
         UserData loginUser = new UserData("bob", "thebuilder", null);
         UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
             () -> userService.checkLogin(loginUser));
+    }
+
+    @Test
+    @DisplayName("checkLogout() positive")
+    public void checkLogoutService() throws Exception {
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        userDAO.addUserData(user);
+        AuthData authorization = authService.createAuth(user);
+        Assertions.assertEquals(authorization, authDAO.getAuthData(authorization.authToken()),
+                "authorization was not added to Memory");
+        authService.checkLogout(authorization.authToken());
+        Assertions.assertEquals(null, authDAO.getAuthData(authorization.authToken()),
+                "authorization was not removed from Memory");
+    }
+
+    @Test
+    @DisplayName("checkLogout() negative")
+    public void checkLogoutService_N() throws Exception {
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        userDAO.addUserData(user);
+        authService.createAuth(user);
+        UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
+            () -> authService.checkLogout("abcdefg"));
     }
 
 }

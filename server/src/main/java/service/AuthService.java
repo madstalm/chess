@@ -5,6 +5,7 @@ import model.AuthData;
 import model.UserData;
 import dataaccess.DataAccessException;
 import dataaccess.InvalidInputException;
+import dataaccess.UnauthorizedException;
 
 import java.util.Collection;
 import java.util.Random;
@@ -25,6 +26,13 @@ public class AuthService {
         AuthData authData = new AuthData(authToken, username);
         dataAccess.addAuthData(authData);
         return authData;
+    }
+
+    public void checkLogout(String authToken) throws Exception {
+            if (dataAccess.getAuthData(authToken) == null) {
+                throw new UnauthorizedException("Error: unauthorized");
+            }
+            dataAccess.deleteAuthData(authToken);
     }
 
     public void clear() throws DataAccessException {

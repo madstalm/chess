@@ -56,6 +56,7 @@ public class Server {
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
 
         
         Spark.awaitInitialization();
@@ -110,12 +111,34 @@ public class Server {
             res.status(200);
             return new Gson().toJson(authorization);
         } catch (JsonSyntaxException e) {
-            res.status(400);
+            res.status(500);
             return new Gson().toJson("Error: bad request");
         }
         catch (InvalidInputException e) {
             res.status(500);
             return new Gson().toJson(e.getMessage());
+        }
+        catch (UnauthorizedException e) {
+            res.status(401);
+            return new Gson().toJson(e.getMessage());
+        }
+        catch (Exception e) {
+            res.status(400);
+            return new Gson().toJson(e.getMessage());
+        }
+    }
+
+    private Object logout(Request req, Response res) throws Exception {
+        res.type("application/json");
+        try {
+            var token = req.headers("authorization");
+            authService.checkLogout(token);
+            res.status(200);
+            return "";
+        }
+        catch (JsonSyntaxException e) {
+            res.status(500);
+            return new Gson().toJson("Error: bad request");
         }
         catch (UnauthorizedException e) {
             res.status(401);

@@ -55,8 +55,6 @@ public class UserService {
         return checkUser;
     }
 
-	public void logout(AuthData auth) {}
-
     public void clear() throws DataAccessException {
         dataAccess.deleteAllUsers();
     }
