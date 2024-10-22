@@ -6,8 +6,6 @@ import com.google.gson.JsonSyntaxException;
 import spark.*;
 import java.util.*;
 
-import org.eclipse.jetty.websocket.server.WebSocketHandler;
-
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 import dataaccess.InvalidInputException;
@@ -57,7 +55,8 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
-        //Spark.get("/game", this::listGames);
+        Spark.get("/game", this::listGames);
+        Spark.post("/game", this::createGame);
         
         Spark.exception(AlreadyTakenException.class, this::alreadyTakenException);
         Spark.exception(DataAccessException.class, this::dataAccessException);
@@ -108,13 +107,26 @@ public class Server {
         res.status(200);
         return "";
     }
-/*
+
     private Object listGames(Request req, Response res) throws Exception {
         res.type("application/json");
         var token = req.headers("authorization");
-        return new Gson().toJson();
+        authService.checkAuth(token);
+        Collection<GameData> games = gameService.getGames();
+        res.status(200);
+        return new Gson().toJson(Map.of("games", games));
     }
-*/
+
+    private Object createGame(Request req, Response res) throws Exception {
+        res.type("application/json");
+        var token = req.headers("authorization");
+        authService.checkAuth(token);
+        var game = new Gson().fromJson(req.body(), GameData.class);
+        Integer gameID = gameService.gameCreator(game);
+        res.status(200);
+        return new Gson().toJson(Map.of("gameID", gameID));
+    }
+
     private void unauthorizedException(UnauthorizedException ex, Request req, Response res) {
         res.status(401);
         res.body(new Gson().toJson(Map.of("message", ex.getMessage())));

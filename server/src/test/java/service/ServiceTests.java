@@ -1,5 +1,9 @@
 package service;
 
+import java.util.*;
+
+import javax.xml.crypto.Data;
+
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import org.junit.jupiter.api.Assertions;
@@ -169,6 +173,42 @@ public class ServiceTests {
         authDAO.addAuthData(authorization);
         UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
             () -> authService.checkAuth("23456"));
+    }
+
+    @Test
+    @DisplayName("getGames() positive")
+    public void getGamesService() throws Exception {
+        GameData game = new GameData(null, null, null, "a game", new chess.ChessGame());
+        gameDAO.addGame(game);
+        Assertions.assertNotNull(gameService.getGames(),
+                "getGames() returned no games");
+    }
+
+    @Test
+    @DisplayName("getGames() negative")
+    public void getGamesService_N() throws Exception {
+        Collection<GameData> empty = new ArrayList<>();
+        Assertions.assertIterableEquals(empty, gameService.getGames(),
+                "getGames() returned games");
+    }
+
+    @Test
+    @DisplayName("createGame() positive")
+    public void createGameService() throws Exception {
+        GameData game = new GameData(null, null, null, "a game", new chess.ChessGame());
+        Integer gameID = gameService.gameCreator(game);
+        Assertions.assertEquals(1, gameID, "game creation did not start at 1");
+        Assertions.assertNotNull(gameDAO.getGameData(1), "there is no game with gameID=1");
+    }
+
+    @Test
+    @DisplayName("createGame() negative")
+    public void createGameService_N() throws Exception {
+        GameData game = new GameData(null, null, null, null, null);
+        assertThrows(DataAccessException.class,
+            () -> gameService.gameCreator(game));
+        assertThrows(DataAccessException.class,
+            () -> gameService.gameCreator(null));
     }
 
 }

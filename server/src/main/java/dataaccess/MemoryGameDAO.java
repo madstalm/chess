@@ -4,16 +4,21 @@ import java.util.Collection;
 import java.util.HashMap;
 
 import model.GameData;
+import chess.ChessGame;
 
 public class MemoryGameDAO implements GameDAO {
-    private int nextId = 1;
+    private int nextId = 0;
     
     final private HashMap<Integer, GameData> games = new HashMap<>();
 
-    public GameData addGame(GameData game) {
+    public GameData addGame(GameData game) throws DataAccessException {
         nextId++;
+
+        if ((game == null)||(game.gameName() == null)||(game.gameName().isEmpty())) {
+            throw new DataAccessException("Error: invalid game was passed to DAO");
+        }
         
-        game = new GameData(nextId, game.whiteUsername(), game.blackUsername(), game.gameName(), game.game());
+        game = new GameData(nextId, game.whiteUsername(), game.blackUsername(), game.gameName(), new ChessGame());
         games.put(game.gameID(), game);
         return game;
     }
@@ -36,7 +41,7 @@ public class MemoryGameDAO implements GameDAO {
 
     public void deleteAllGames() {
         games.clear();
-        nextId = 1; //resets the game IDs to 1
+        nextId = 0; //resets the game IDs to 1
     }
     
 }

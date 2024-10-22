@@ -1,9 +1,13 @@
 package model;
 
+import java.util.Objects;
+
 import com.google.gson.Gson;
 
-public record GameData(int gameID, String whiteUsername, String blackUsername, String gameName, chess.ChessGame game) {
+import chess.ChessGame;
 
+public record GameData(Integer gameID, String whiteUsername, String blackUsername, String gameName, ChessGame game) {
+    
     public String toString() {
         return new Gson().toJson(this);
     }
