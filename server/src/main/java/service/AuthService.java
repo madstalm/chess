@@ -28,10 +28,15 @@ public class AuthService {
         return authData;
     }
 
+    public String checkAuth(String authToken) throws Exception {
+        if (dataAccess.getAuthData(authToken) == null) {
+            throw new UnauthorizedException("Error: unauthorized");
+        }
+        return authToken;
+    }
+
     public void checkLogout(String authToken) throws Exception {
-            if (dataAccess.getAuthData(authToken) == null) {
-                throw new UnauthorizedException("Error: unauthorized");
-            }
+            checkAuth(authToken);
             dataAccess.deleteAuthData(authToken);
     }
 

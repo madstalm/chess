@@ -57,7 +57,14 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
-
+        //Spark.get("/game", this::listGames);
+        
+        Spark.exception(AlreadyTakenException.class, this::alreadyTakenException);
+        Spark.exception(DataAccessException.class, this::dataAccessException);
+        Spark.exception(InvalidInputException.class, this::invalidInputException);
+        Spark.exception(UnauthorizedException.class, this::unauthorizedException);
+        Spark.exception(JsonSyntaxException.class, this::jsonSyntaxException);
+        Spark.exception(Exception.class, this::exception);
         
         Spark.awaitInitialization();
         return Spark.port();
@@ -78,76 +85,64 @@ public class Server {
 
     private Object register(Request req, Response res) throws Exception {
         res.type("application/json");
-        try {
-            var user = new Gson().fromJson(req.body(), UserData.class);
-            userService.registerUser(user);
-            AuthData authorization = authService.createAuth(user);
-            res.status(200);
-            return new Gson().toJson(authorization);
-        } catch (JsonSyntaxException e) {
-            res.status(400);
-            return new Gson().toJson("Error: bad request");
-        }
-        catch (AlreadyTakenException e) {
-            res.status(403);
-            return new Gson().toJson(e.getMessage());
-        }
-        catch (InvalidInputException e) {
-            res.status(500);
-            return new Gson().toJson(e.getMessage());
-        }
-        catch (Exception e) {
-            res.status(400);
-            return new Gson().toJson(e.getMessage());
-        }
+        var user = new Gson().fromJson(req.body(), UserData.class);
+        userService.registerUser(user);
+        AuthData authorization = authService.createAuth(user);
+        res.status(200);
+        return new Gson().toJson(authorization);
     }
 
     private Object login(Request req, Response res) throws Exception {
         res.type("application/json");
-        try {
-            var user = new Gson().fromJson(req.body(), UserData.class);
-            UserData checked = userService.checkLogin(user);
-            AuthData authorization = authService.createAuth(checked);
-            res.status(200);
-            return new Gson().toJson(authorization);
-        } catch (JsonSyntaxException e) {
-            res.status(500);
-            return new Gson().toJson("Error: bad request");
-        }
-        catch (InvalidInputException e) {
-            res.status(500);
-            return new Gson().toJson(e.getMessage());
-        }
-        catch (UnauthorizedException e) {
-            res.status(401);
-            return new Gson().toJson(e.getMessage());
-        }
-        catch (Exception e) {
-            res.status(400);
-            return new Gson().toJson(e.getMessage());
-        }
+        var user = new Gson().fromJson(req.body(), UserData.class);
+        UserData checked = userService.checkLogin(user);
+        AuthData authorization = authService.createAuth(checked);
+        res.status(200);
+        return new Gson().toJson(authorization);
     }
 
     private Object logout(Request req, Response res) throws Exception {
         res.type("application/json");
-        try {
-            var token = req.headers("authorization");
-            authService.checkLogout(token);
-            res.status(200);
-            return "";
-        }
-        catch (JsonSyntaxException e) {
-            res.status(500);
-            return new Gson().toJson("Error: bad request");
-        }
-        catch (UnauthorizedException e) {
-            res.status(401);
-            return new Gson().toJson(e.getMessage());
-        }
-        catch (Exception e) {
-            res.status(400);
-            return new Gson().toJson(e.getMessage());
-        }
+        var token = req.headers("authorization");
+        authService.checkLogout(token);
+        res.status(200);
+        return "";
+    }
+/*
+    private Object listGames(Request req, Response res) throws Exception {
+        res.type("application/json");
+        var token = req.headers("authorization");
+        return new Gson().toJson();
+    }
+*/
+    private void unauthorizedException(UnauthorizedException ex, Request req, Response res) {
+        res.status(401);
+        res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
+    }
+
+    private void jsonSyntaxException(JsonSyntaxException ex, Request req, Response res) {
+        res.status(500);
+        res.body(new Gson().toJson(Map.of("message", "Error: bad request")));
+    }
+
+    private void invalidInputException(InvalidInputException ex, Request req, Response res) {
+        res.status(400);
+        res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
+    }
+
+    private void alreadyTakenException(AlreadyTakenException ex, Request req, Response res) {
+        res.status(403);
+        res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
+    }
+
+    private void exception(Exception ex, Request req, Response res) {
+        res.status(500);
+        res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
+    }
+
+    private void dataAccessException(DataAccessException ex, Request req, Response res) {
+        res.status(500);
+        res.body(new Gson().toJson(Map.of("message", ex.getMessage())));
     }
 
 }

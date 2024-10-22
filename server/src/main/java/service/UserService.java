@@ -26,7 +26,7 @@ public class UserService {
         */
         String username = user.username();
         if ((username == null) || (username.isEmpty()) || (user.password() == null) || (user.password().isEmpty())) {
-            throw new Exception("Error: bad request");
+            throw new InvalidInputException("Error: bad request");
         }
         if (dataAccess.getUserData(username) != null) {
             throw new AlreadyTakenException("Error: already taken");
@@ -49,7 +49,7 @@ public class UserService {
             throw new UnauthorizedException("Error: unauthorized");
         }
         String checkPassword = checkUser.password();
-        if (checkPassword != password) {
+        if (!checkPassword.equals(password)) {
             throw new UnauthorizedException("Error: unauthorized");
         }
         return checkUser;

@@ -134,4 +134,41 @@ public class ServiceTests {
             () -> authService.checkLogout("abcdefg"));
     }
 
+    @Test
+    @DisplayName("login and logout and login")
+    public void loginlogoutloginService() throws Exception {
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        userDAO.addUserData(user);
+        AuthData authorization = authService.createAuth(user); //first login
+        Assertions.assertEquals(authorization, authDAO.getAuthData(authorization.authToken()),
+                "authorization was not added to Memory");
+        authService.checkLogout(authorization.authToken()); //first logout
+        Assertions.assertEquals(null, authDAO.getAuthData(authorization.authToken()),
+                "authorization was not removed from Memory"); //make sure logout removed authdata from memory
+        Assertions.assertEquals(user.password(), userDAO.getUserData("bob").password(),
+                "user was deleted prematurely"); //make sure user is still in memory
+        AuthData authorization2 = authService.createAuth(user); //2nd login
+        Assertions.assertEquals(authorization2.authToken(), authDAO.getAuthData(authorization2.authToken()).authToken(),
+                "authToken not in memory"); //check that new authdata was created
+    }
+
+    @Test
+    @DisplayName("checkAuth() positive")
+    public void checkAuthService() throws Exception {
+        AuthData authorization = new AuthData("123456", "bob");
+        authDAO.addAuthData(authorization);
+        String checked = authService.checkAuth("123456");
+        Assertions.assertEquals(authorization.authToken(), checked,
+                "authorization was not returned by checkAuth()");
+    }
+
+    @Test
+    @DisplayName("checkAuth() negative")
+    public void checkAuthService_N() throws Exception {
+        AuthData authorization = new AuthData("123456", "bob");
+        authDAO.addAuthData(authorization);
+        UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
+            () -> authService.checkAuth("23456"));
+    }
+
 }
