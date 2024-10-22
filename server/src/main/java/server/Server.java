@@ -59,7 +59,7 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private Object clear(Request req, Response res) throws DataAccessException {
+    private Object clear(Request req, Response res) throws Exception {
         authService.clear();
         gameService.clear();
         userService.clear();
