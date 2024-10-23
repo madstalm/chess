@@ -14,7 +14,7 @@ public class MemoryGameDAO implements GameDAO {
     public GameData addGame(GameData game) throws DataAccessException {
         nextId++;
 
-        if ((game == null)||(game.gameName() == null)||(game.gameName().isEmpty())) {
+        if ((game == null)||(game.gameName() == null)) {
             throw new DataAccessException("Error: invalid game was passed to DAO");
         }
         

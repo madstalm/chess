@@ -1,7 +1,6 @@
 package service;
 
 import dataaccess.UserDAO;
-import model.AuthData;
 import model.UserData;
 import dataaccess.DataAccessException;
 import dataaccess.InvalidInputException;
@@ -31,9 +30,12 @@ public class UserService {
         if (dataAccess.getUserData(username) != null) {
             throw new AlreadyTakenException("Error: already taken");
         }
+        // uncomment to reactivate email validation functionality
+        /*
         if (invalidEmail(user.email())) {
             throw new InvalidInputException("Error: invalid email");
         }
+        */
         dataAccess.addUserData(user);
         return user;
     }

@@ -3,6 +3,7 @@ package server;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
+import chess.ChessGame;
 import spark.*;
 import java.util.*;
 
@@ -57,6 +58,7 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
         Spark.post("/game", this::createGame);
+        Spark.put("/game", this::joinGame);
         
         Spark.exception(AlreadyTakenException.class, this::alreadyTakenException);
         Spark.exception(DataAccessException.class, this::dataAccessException);
@@ -127,6 +129,19 @@ public class Server {
         return new Gson().toJson(Map.of("gameID", gameID));
     }
 
+    private Object joinGame(Request req, Response res) throws Exception {
+        res.type("application/json");
+        var token = req.headers("authorization");
+        AuthData authorization = authService.checkAuth(token);
+        var request = new Gson().fromJson(req.body(), JoinGameRequest.class);
+        Integer gameID = request.gameID();
+        ChessGame.TeamColor playerColor = request.playerColor();
+        gameService.gameJoiner(authorization, gameID, playerColor);
+        res.status(200);
+        return "";
+    }
+
+    // Error/Exception Handling
     private void unauthorizedException(UnauthorizedException ex, Request req, Response res) {
         res.status(401);
         res.body(new Gson().toJson(Map.of("message", ex.getMessage())));

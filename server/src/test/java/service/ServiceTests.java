@@ -15,12 +15,15 @@ import org.junit.jupiter.api.Test;
 import dataaccess.DataAccessException;
 import dataaccess.InvalidInputException;
 import dataaccess.UnauthorizedException;
+import dataaccess.AlreadyTakenException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
+
+import chess.ChessGame;
 
 public class ServiceTests {
     private static dataaccess.AuthDAO authDAO;
@@ -72,8 +75,8 @@ public class ServiceTests {
     @Test
     @DisplayName("registerUser() negative")
     public void registerUserService_N() throws Exception {
-        UserData user = new UserData("bob", "theBuilder", "hecanfix.it");
-        InvalidInputException thrown = assertThrows(InvalidInputException.class,
+        UserData user = new UserData("bob", null, "hecanfix.it");
+        assertThrows(InvalidInputException.class,
             () -> userService.registerUser(user));
     }
 
@@ -90,7 +93,7 @@ public class ServiceTests {
     @DisplayName("createAuth() negative")
     public void createAuthService_N() throws Exception {
         UserData user = new UserData(null, "theBuilder", "hecanfix.it");
-        InvalidInputException thrown = assertThrows(InvalidInputException.class,
+        assertThrows(InvalidInputException.class,
             () -> authService.createAuth(user));
     }
 
@@ -111,7 +114,7 @@ public class ServiceTests {
         UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
         userDAO.addUserData(user);
         UserData loginUser = new UserData("bob", "thebuilder", null);
-        UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
+        assertThrows(UnauthorizedException.class,
             () -> userService.checkLogin(loginUser));
     }
 
@@ -134,7 +137,7 @@ public class ServiceTests {
         UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
         userDAO.addUserData(user);
         authService.createAuth(user);
-        UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
+        assertThrows(UnauthorizedException.class,
             () -> authService.checkLogout("abcdefg"));
     }
 
@@ -161,8 +164,8 @@ public class ServiceTests {
     public void checkAuthService() throws Exception {
         AuthData authorization = new AuthData("123456", "bob");
         authDAO.addAuthData(authorization);
-        String checked = authService.checkAuth("123456");
-        Assertions.assertEquals(authorization.authToken(), checked,
+        AuthData checked = authService.checkAuth("123456");
+        Assertions.assertEquals(authorization, checked,
                 "authorization was not returned by checkAuth()");
     }
 
@@ -171,7 +174,7 @@ public class ServiceTests {
     public void checkAuthService_N() throws Exception {
         AuthData authorization = new AuthData("123456", "bob");
         authDAO.addAuthData(authorization);
-        UnauthorizedException thrown = assertThrows(UnauthorizedException.class,
+        assertThrows(UnauthorizedException.class,
             () -> authService.checkAuth("23456"));
     }
 
@@ -195,7 +198,7 @@ public class ServiceTests {
     @Test
     @DisplayName("createGame() positive")
     public void createGameService() throws Exception {
-        GameData game = new GameData(null, null, null, "a game", new chess.ChessGame());
+        GameData game = new GameData(null, null, null, "a game", null);
         Integer gameID = gameService.gameCreator(game);
         Assertions.assertEquals(1, gameID, "game creation did not start at 1");
         Assertions.assertNotNull(gameDAO.getGameData(1), "there is no game with gameID=1");
@@ -209,6 +212,33 @@ public class ServiceTests {
             () -> gameService.gameCreator(game));
         assertThrows(DataAccessException.class,
             () -> gameService.gameCreator(null));
+    }
+
+    @Test
+    @DisplayName("joinGame() positive")
+    public void joinGameService() throws Exception {
+        GameData game = new GameData(null, null, null, "a game", null);
+        Integer gameID = gameService.gameCreator(game);
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        userDAO.addUserData(user);
+        AuthData authorization = new AuthData("123456", "bob");
+        authDAO.addAuthData(authorization);
+        gameService.gameJoiner(authorization, gameID, ChessGame.TeamColor.BLACK);
+        Assertions.assertEquals(user.username(), gameDAO.getGameData(gameID).blackUsername(),
+                "game creation did not start at 1");
+    }
+
+    @Test
+    @DisplayName("joinGame() negative")
+    public void joinGameService_N() throws Exception {
+        GameData game = new GameData(null, null, "scoop", "a game", null);
+        Integer gameID = gameService.gameCreator(game);
+        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        userDAO.addUserData(user);
+        AuthData authorization = new AuthData("123456", "bob");
+        authDAO.addAuthData(authorization);
+        assertThrows(AlreadyTakenException.class,
+            () -> gameService.gameJoiner(authorization, gameID, ChessGame.TeamColor.BLACK));
     }
 
 }

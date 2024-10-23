@@ -28,16 +28,17 @@ public class AuthService {
         return authData;
     }
 
-    public String checkAuth(String authToken) throws Exception {
-        if (dataAccess.getAuthData(authToken) == null) {
+    public AuthData checkAuth(String authToken) throws Exception {
+        AuthData authorization = dataAccess.getAuthData(authToken);
+        if (authorization == null) {
             throw new UnauthorizedException("Error: unauthorized");
         }
-        return authToken;
+        return authorization;
     }
 
     public void checkLogout(String authToken) throws Exception {
-            checkAuth(authToken);
-            dataAccess.deleteAuthData(authToken);
+        checkAuth(authToken);
+        dataAccess.deleteAuthData(authToken);
     }
 
     public void clear() throws DataAccessException {
