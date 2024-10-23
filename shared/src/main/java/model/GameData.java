@@ -1,7 +1,5 @@
 package model;
 
-import java.util.Objects;
-
 import com.google.gson.Gson;
 
 import chess.ChessGame;

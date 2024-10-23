@@ -114,7 +114,7 @@ public class Server {
         res.type("application/json");
         var token = req.headers("authorization");
         authService.checkAuth(token);
-        Collection<GameData> games = gameService.getGames();
+        Collection<ListGamesResponse> games = gameService.getGames();
         res.status(200);
         return new Gson().toJson(Map.of("games", games));
     }

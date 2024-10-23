@@ -4,10 +4,12 @@ import dataaccess.GameDAO;
 import dataaccess.InvalidInputException;
 import model.GameData;
 import model.AuthData;
+import server.ListGamesResponse;
 import chess.ChessGame;
 import dataaccess.AlreadyTakenException;
 import dataaccess.DataAccessException;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class GameService {
@@ -17,8 +19,13 @@ public class GameService {
         this.dataAccess = dataAccess;
     }
 
-    public Collection<GameData> getGames() throws DataAccessException {
-        return dataAccess.listGames();
+    public Collection<ListGamesResponse> getGames() throws DataAccessException {
+        Collection<GameData> games = dataAccess.listGames();
+        Collection<ListGamesResponse> gamesList = new ArrayList<>();
+        for (GameData game : games) {
+            gamesList.add(new ListGamesResponse(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()));
+        }
+        return gamesList;
     }
 
     public Integer gameCreator(GameData game) throws DataAccessException {
