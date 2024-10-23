@@ -8,14 +8,14 @@ public class QueenMovesCalculator extends PieceMovesCalculator {
         ChessPiece.PieceType promotionPiece = null;
         Collection<ChessMove> moves = new ArrayList<>();
         Collection<ChessPosition> squares = new ArrayList<>();
-        squares = scanQuad1(board, myPosition, myPosition, squares);
-        squares = scanQuad2(board, myPosition, myPosition, squares);
-        squares = scanQuad3(board, myPosition, myPosition, squares);
-        squares = scanQuad4(board, myPosition, myPosition, squares);
-        squares = scanUp(board, myPosition, myPosition, squares);
-        squares = scanDown(board, myPosition, myPosition, squares);
-        squares = scanRight(board, myPosition, myPosition, squares);
-        squares = scanLeft(board, myPosition, myPosition, squares);
+        squares = scanQuad(board, myPosition, myPosition, squares, 1);
+        squares = scanQuad(board, myPosition, myPosition, squares, 2);
+        squares = scanQuad(board, myPosition, myPosition, squares, 3);
+        squares = scanQuad(board, myPosition, myPosition, squares, 4);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.UP);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.DOWN);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.LEFT);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.RIGHT);
         for (ChessPosition square : squares) {
             moves.add(new ChessMove(myPosition, square, promotionPiece));
         }

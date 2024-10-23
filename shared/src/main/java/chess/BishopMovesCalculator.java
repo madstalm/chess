@@ -9,10 +9,10 @@ public class BishopMovesCalculator extends PieceMovesCalculator {
         ChessPiece.PieceType promotionPiece = null;
         Collection<ChessMove> moves = new ArrayList<>();
         Collection<ChessPosition> squares = new ArrayList<>();
-        squares = scanQuad1(board, myPosition, myPosition, squares); //Q1 squares
-        squares = scanQuad2(board, myPosition, myPosition, squares);
-        squares = scanQuad3(board, myPosition, myPosition, squares);
-        squares = scanQuad4(board, myPosition, myPosition, squares);
+        squares = scanQuad(board, myPosition, myPosition, squares, 1); //Q1 squares
+        squares = scanQuad(board, myPosition, myPosition, squares, 2);
+        squares = scanQuad(board, myPosition, myPosition, squares, 3);
+        squares = scanQuad(board, myPosition, myPosition, squares, 4);
         for (ChessPosition square : squares) {
             moves.add(new ChessMove(myPosition, square, promotionPiece));
         }

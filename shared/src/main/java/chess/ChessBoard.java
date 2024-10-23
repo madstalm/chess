@@ -47,11 +47,15 @@ public class ChessBoard {
 
     @Override
     public String toString() { 
-        return "|" + squares[7][0] + "|" +squares[7][1] + "|" +squares[7][2] + "|" +squares[7][3] + "|" +squares[7][4] + "|" +squares[7][5] + "|" +squares[7][6] + "|" +squares[7][7] + "|\n" +
-            "|" + squares[6][0] + "|" +squares[6][1] + "|" +squares[6][2] + "|" +squares[6][3] + "|" +squares[6][4] + "|" +squares[6][5] + "|" +squares[6][6] + "|" +squares[6][7] + "|\n" +
+        return "|" + squares[7][0] + "|" +squares[7][1] + "|" +squares[7][2] + "|" +squares[7][3] + "|"
+                +squares[7][4] + "|" +squares[7][5] + "|" +squares[7][6] + "|" +squares[7][7] + "|\n" +
+            "|" + squares[6][0] + "|" +squares[6][1] + "|" +squares[6][2] + "|" +squares[6][3] + "|"
+                +squares[6][4] + "|" +squares[6][5] + "|" +squares[6][6] + "|" +squares[6][7] + "|\n" +
             ". . . . . . . . .\n" +
-            "|" + squares[1][0] + "|" +squares[1][1] + "|" +squares[1][2] + "|" +squares[1][3] + "|" +squares[1][4] + "|" +squares[1][5] + "|" +squares[1][6] + "|" +squares[1][7] + "|\n" +
-            "|" + squares[0][0] + "|" +squares[0][1] + "|" +squares[0][2] + "|" +squares[0][3] + "|" +squares[0][4] + "|" +squares[0][5] + "|" +squares[0][6] + "|" +squares[0][7] + "|";
+            "|" + squares[1][0] + "|" +squares[1][1] + "|" +squares[1][2] + "|" +squares[1][3] + "|"
+                +squares[1][4] + "|" +squares[1][5] + "|" +squares[1][6] + "|" +squares[1][7] + "|\n" +
+            "|" + squares[0][0] + "|" +squares[0][1] + "|" +squares[0][2] + "|" +squares[0][3] + "|"
+                +squares[0][4] + "|" +squares[0][5] + "|" +squares[0][6] + "|" +squares[0][7] + "|";
     }
 
     /**

@@ -75,11 +75,32 @@ public class PieceMovesCalculator {
         }
     }
 
-    //Diagonal Scanners
-    public static Collection<ChessPosition> scanQuad1(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow() + 1;
-        int col = myPosition.getColumn() + 1;
+    //Diagonal Scanner
+    public static Collection<ChessPosition> scanQuad(ChessBoard board, ChessPosition myPosition,
+            ChessPosition originalPosition, Collection<ChessPosition> moves, int quad) {
+        
+        int rMod = 0;
+        int cMod = 0;
+        switch (quad) {
+            case 1:
+                rMod = 1;
+                cMod = 1;
+                break;
+            case 2:
+                rMod = 1;
+                cMod = -1;
+                break;
+            case 3:
+                rMod = -1;
+                cMod = -1;
+                break;
+            case 4:
+                rMod = -1;
+                cMod = 1;
+                break;
+        }
+        int row = myPosition.getRow() + rMod;
+        int col = myPosition.getColumn() + cMod;
         ChessPosition next = new ChessPosition(row, col);
         boolean outOfBounds = moveOutofBounds(next);
         if (outOfBounds) {
@@ -97,43 +118,40 @@ public class PieceMovesCalculator {
         }
         else {
             moves.add(next);
-            moves = scanQuad1(board, next, originalPosition, moves);
+            moves = scanQuad(board, next, originalPosition, moves, quad);
         }
         return moves;
     }
 
-
-    public static Collection<ChessPosition> scanQuad2(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow() + 1;
-        int col = myPosition.getColumn() - 1;
-        ChessPosition next = new ChessPosition(row, col);
-        boolean outOfBounds = moveOutofBounds(next);
-        if (outOfBounds) {
-            return moves;
-        }
-        boolean occupied = spaceOccupied(board, next);
-        if (occupied) {
-            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-            if (friendOrFoe) {
-                moves.add(next);
-            }
-            else {
-                return moves;
-            }
-        }
-        else {
-            moves.add(next);
-            moves = scanQuad2(board, next, originalPosition, moves);
-        }
-        return moves;
+    //Compass Scanner
+    public enum Direction {
+        UP,
+        DOWN,
+        LEFT,
+        RIGHT
     }
-
-
-    public static Collection<ChessPosition> scanQuad3(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow() - 1;
-        int col = myPosition.getColumn() - 1;
+    
+    public static Collection<ChessPosition> scanCompass(ChessBoard board, ChessPosition myPosition,
+            ChessPosition originalPosition, Collection<ChessPosition> moves, Direction direction) {
+        
+        int rMod = 0;
+        int cMod = 0;
+        switch (direction) {
+             case UP:
+                rMod = 1;
+                break;
+            case DOWN:
+                rMod = -1;
+                break;
+            case LEFT:
+                cMod = -1;
+                break;
+            case RIGHT:
+                cMod = 1;
+                break;
+        }
+        int row = myPosition.getRow() + rMod;
+        int col = myPosition.getColumn() + cMod;
         ChessPosition next = new ChessPosition(row, col);
         boolean outOfBounds = moveOutofBounds(next);
         if (outOfBounds) {
@@ -151,142 +169,7 @@ public class PieceMovesCalculator {
         }
         else {
             moves.add(next);
-            moves = scanQuad3(board, next, originalPosition, moves);
-        }
-        return moves;
-    }
-
-
-    public static Collection<ChessPosition> scanQuad4(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow() - 1;
-        int col = myPosition.getColumn() + 1;
-        ChessPosition next = new ChessPosition(row, col);
-        boolean outOfBounds = moveOutofBounds(next);
-        if (outOfBounds) {
-            return moves;
-        }
-        boolean occupied = spaceOccupied(board, next);
-        if (occupied) {
-            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-            if (friendOrFoe) {
-                moves.add(next);
-            }
-            else {
-                return moves;
-            }
-        }
-        else {
-            moves.add(next);
-            moves = scanQuad4(board, next, originalPosition, moves);
-        }
-        return moves;
-    }
-
-    //Compass Scanners
-    public static Collection<ChessPosition> scanUp(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow() + 1;
-        int col = myPosition.getColumn();
-        ChessPosition next = new ChessPosition(row, col);
-        boolean outOfBounds = moveOutofBounds(next);
-        if (outOfBounds) {
-            return moves;
-        }
-        boolean occupied = spaceOccupied(board, next);
-        if (occupied) {
-            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-            if (friendOrFoe) {
-                moves.add(next);
-            }
-            else {
-                return moves;
-            }
-        }
-        else {
-            moves.add(next);
-            moves = scanUp(board, next, originalPosition, moves);
-        }
-        return moves;
-    }
-
-
-    public static Collection<ChessPosition> scanDown(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow() - 1;
-        int col = myPosition.getColumn();
-        ChessPosition next = new ChessPosition(row, col);
-        boolean outOfBounds = moveOutofBounds(next);
-        if (outOfBounds) {
-            return moves;
-        }
-        boolean occupied = spaceOccupied(board, next);
-        if (occupied) {
-            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-            if (friendOrFoe) {
-                moves.add(next);
-            }
-            else {
-                return moves;
-            }
-        }
-        else {
-            moves.add(next);
-            moves = scanDown(board, next, originalPosition, moves);
-        }
-        return moves;
-    }
-
-
-    public static Collection<ChessPosition> scanRight(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn() + 1;
-        ChessPosition next = new ChessPosition(row, col);
-        boolean outOfBounds = moveOutofBounds(next);
-        if (outOfBounds) {
-            return moves;
-        }
-        boolean occupied = spaceOccupied(board, next);
-        if (occupied) {
-            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-            if (friendOrFoe) {
-                moves.add(next);
-            }
-            else {
-                return moves;
-            }
-        }
-        else {
-            moves.add(next);
-            moves = scanRight(board, next, originalPosition, moves);
-        }
-        return moves;
-    }
-
-
-    public static Collection<ChessPosition> scanLeft(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves) {
-        int row = myPosition.getRow();
-        int col = myPosition.getColumn() - 1;
-        ChessPosition next = new ChessPosition(row, col);
-        boolean outOfBounds = moveOutofBounds(next);
-        if (outOfBounds) {
-            return moves;
-        }
-        boolean occupied = spaceOccupied(board, next);
-        if (occupied) {
-            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-            if (friendOrFoe) {
-                moves.add(next);
-            }
-            else {
-                return moves;
-            }
-        }
-        else {
-            moves.add(next);
-            moves = scanLeft(board, next, originalPosition, moves);
+            moves = scanCompass(board, next, originalPosition, moves, direction);
         }
         return moves;
     }

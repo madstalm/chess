@@ -8,10 +8,10 @@ public class RookMovesCalculator extends PieceMovesCalculator {
         ChessPiece.PieceType promotionPiece = null;
         Collection<ChessMove> moves = new ArrayList<>();
         Collection<ChessPosition> squares = new ArrayList<>();
-        squares = scanUp(board, myPosition, myPosition, squares);
-        squares = scanDown(board, myPosition, myPosition, squares);
-        squares = scanRight(board, myPosition, myPosition, squares);
-        squares = scanLeft(board, myPosition, myPosition, squares);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.UP);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.DOWN);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.LEFT);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.RIGHT);
         for (ChessPosition square : squares) {
             moves.add(new ChessMove(myPosition, square, promotionPiece));
         }
