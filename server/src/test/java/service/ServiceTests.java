@@ -56,9 +56,13 @@ public class ServiceTests {
     @Test
     @DisplayName("Clear Positive")
     public void clearService() throws Exception {
+        AuthData authorization = new AuthData("123","bob");
+        authDAO.addAuthData(authorization);
         authService.clear();
         gameService.clear();
         userService.clear();
+        Assertions.assertEquals(null, authDAO.getAuthData("123"),
+                "authDao was not cleared");
     }
     
     @Test
