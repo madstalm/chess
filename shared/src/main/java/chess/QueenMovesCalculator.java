@@ -8,10 +8,10 @@ public class QueenMovesCalculator extends PieceMovesCalculator {
         ChessPiece.PieceType promotionPiece = null;
         Collection<ChessMove> moves = new ArrayList<>();
         Collection<ChessPosition> squares = new ArrayList<>();
-        squares = scanQuad(board, myPosition, myPosition, squares, 1);
-        squares = scanQuad(board, myPosition, myPosition, squares, 2);
-        squares = scanQuad(board, myPosition, myPosition, squares, 3);
-        squares = scanQuad(board, myPosition, myPosition, squares, 4);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.QUAD1);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.QUAD2);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.QUAD3);
+        squares = scanCompass(board, myPosition, myPosition, squares, Direction.QUAD4);
         squares = scanCompass(board, myPosition, myPosition, squares, Direction.UP);
         squares = scanCompass(board, myPosition, myPosition, squares, Direction.DOWN);
         squares = scanCompass(board, myPosition, myPosition, squares, Direction.LEFT);

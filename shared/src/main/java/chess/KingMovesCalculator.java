@@ -50,21 +50,4 @@ public class KingMovesCalculator extends PieceMovesCalculator {
         return squares;
     }
 
-    private static Collection<ChessPosition> validatePositions(ChessBoard board, Collection<ChessPosition> proposed, ChessPosition myPosition) {
-        Collection<ChessPosition> squares = new ArrayList<>();
-        for (ChessPosition square : proposed) {
-            if (!moveOutofBounds(square)) {
-                if (!spaceOccupied(board, square)) {
-                    squares.add(square);
-                }
-                else {
-                    if (friendOrFoe(board, square, myPosition)) {
-                        squares.add(square);
-                    }
-                }
-            }
-        }
-        return squares;
-    }
-
 }

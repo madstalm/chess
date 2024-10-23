@@ -74,53 +74,29 @@ public class PieceMovesCalculator {
         else { return true;
         }
     }
-
-    //Diagonal Scanner
-    public static Collection<ChessPosition> scanQuad(ChessBoard board, ChessPosition myPosition,
-            ChessPosition originalPosition, Collection<ChessPosition> moves, int quad) {
-        
-        int rMod = 0;
-        int cMod = 0;
-        switch (quad) {
-            case 1:
-                rMod = 1;
-                cMod = 1;
-                break;
-            case 2:
-                rMod = 1;
-                cMod = -1;
-                break;
-            case 3:
-                rMod = -1;
-                cMod = -1;
-                break;
-            case 4:
-                rMod = -1;
-                cMod = 1;
-                break;
-        }
-        int row = myPosition.getRow() + rMod;
-        int col = myPosition.getColumn() + cMod;
-        ChessPosition next = new ChessPosition(row, col);
-        boolean outOfBounds = moveOutofBounds(next);
-        if (outOfBounds) {
-            return moves;
-        }
-        boolean occupied = spaceOccupied(board, next);
-        if (occupied) {
-            boolean friendOrFoe = friendOrFoe(board, next, originalPosition);
-            if (friendOrFoe) {
-                moves.add(next);
-            }
-            else {
-                return moves;
+    
+    /**
+     * used by the knight and king move calculators to see if they can move into a space
+     *
+     * @param board current chessboard
+     * @param proposed the space we are evaluating a move into
+     * @param myPosition my piece's position
+     */
+    public static Collection<ChessPosition> validatePositions(ChessBoard board, Collection<ChessPosition> proposed, ChessPosition myPosition) {
+        Collection<ChessPosition> squares = new ArrayList<>();
+        for (ChessPosition square : proposed) {
+            if (!moveOutofBounds(square)) {
+                if (!spaceOccupied(board, square)) {
+                    squares.add(square);
+                }
+                else {
+                    if (friendOrFoe(board, square, myPosition)) {
+                        squares.add(square);
+                    }
+                }
             }
         }
-        else {
-            moves.add(next);
-            moves = scanQuad(board, next, originalPosition, moves, quad);
-        }
-        return moves;
+        return squares;
     }
 
     //Compass Scanner
@@ -128,7 +104,11 @@ public class PieceMovesCalculator {
         UP,
         DOWN,
         LEFT,
-        RIGHT
+        RIGHT,
+        QUAD1,
+        QUAD2,
+        QUAD3,
+        QUAD4
     }
     
     public static Collection<ChessPosition> scanCompass(ChessBoard board, ChessPosition myPosition,
@@ -137,7 +117,7 @@ public class PieceMovesCalculator {
         int rMod = 0;
         int cMod = 0;
         switch (direction) {
-             case UP:
+            case UP:
                 rMod = 1;
                 break;
             case DOWN:
@@ -147,6 +127,22 @@ public class PieceMovesCalculator {
                 cMod = -1;
                 break;
             case RIGHT:
+                cMod = 1;
+                break;
+            case QUAD1:
+                rMod = 1;
+                cMod = 1;
+                break;
+            case QUAD2:
+                rMod = 1;
+                cMod = -1;
+                break;
+            case QUAD3:
+                rMod = -1;
+                cMod = -1;
+                break;
+            case QUAD4:
+                rMod = -1;
                 cMod = 1;
                 break;
         }
