@@ -25,7 +25,8 @@ public class ChessBoard {
             for (int col = 1; col <= 8; ++col) {
                 if (copy.squares[row - 1][col - 1] != null) {
                     ChessPosition position = new ChessPosition(row, col);
-                    squares[row - 1][col - 1] = new ChessPiece(copy.getPiece(position).getTeamColor(), copy.getPiece(position).getPieceType());
+                    squares[row - 1][col - 1] = new ChessPiece(copy.getPiece(position).getTeamColor(),
+                            copy.getPiece(position).getPieceType());
                 }
             }
         }
@@ -33,8 +34,8 @@ public class ChessBoard {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true; // Checks if the current object is compared to itself
-        if (o == null || getClass() != o.getClass()) return false; // Check if the passed object is of the correct type
+        if (this == o) {return true;} // Checks if the current object is compared to itself
+        if (o == null || getClass() != o.getClass()) {return false;} // Check if the passed object is of the correct type
         ChessBoard that = (ChessBoard) o; // Typecast the object to ChessBoard
         return Arrays.deepEquals(squares, that.squares); // Compare  the important fields
     }
@@ -104,38 +105,38 @@ public class ChessBoard {
         ChessPiece whiteRook = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.ROOK);
         ChessPiece blackRook = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.ROOK);
         //set up rooks
-        ChessPosition whiteR_L = new ChessPosition(1, 1);
-        ChessPosition whiteR_R = new ChessPosition(1, 8);
-        ChessPosition blackR_L = new ChessPosition(8, 1);
-        ChessPosition blackR_R = new ChessPosition(8, 8);
-        addPiece(whiteR_L, whiteRook);
-        addPiece(whiteR_R, whiteRook);
-        addPiece(blackR_L, blackRook);
-        addPiece(blackR_R, blackRook);
+        ChessPosition whiteRL = new ChessPosition(1, 1);
+        ChessPosition whiteRR = new ChessPosition(1, 8);
+        ChessPosition blackRL = new ChessPosition(8, 1);
+        ChessPosition blackRR = new ChessPosition(8, 8);
+        addPiece(whiteRL, whiteRook);
+        addPiece(whiteRR, whiteRook);
+        addPiece(blackRL, blackRook);
+        addPiece(blackRR, blackRook);
         //create knights
         ChessPiece whiteKnight = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.KNIGHT);
         ChessPiece blackKnight = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.KNIGHT);
         //set up knights
-        ChessPosition whiteKN_L = new ChessPosition(1, 2);
-        ChessPosition whiteKN_R = new ChessPosition(1, 7);
-        ChessPosition blackKN_L = new ChessPosition(8, 2);
-        ChessPosition blackKN_R = new ChessPosition(8, 7);
-        addPiece(whiteKN_L, whiteKnight);
-        addPiece(whiteKN_R, whiteKnight);
-        addPiece(blackKN_L, blackKnight);
-        addPiece(blackKN_R, blackKnight);
+        ChessPosition whiteKnL = new ChessPosition(1, 2);
+        ChessPosition whiteKnR = new ChessPosition(1, 7);
+        ChessPosition blackKnL = new ChessPosition(8, 2);
+        ChessPosition blackKnR = new ChessPosition(8, 7);
+        addPiece(whiteKnL, whiteKnight);
+        addPiece(whiteKnR, whiteKnight);
+        addPiece(blackKnL, blackKnight);
+        addPiece(blackKnR, blackKnight);
         //create bishops
         ChessPiece whiteBishop = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.BISHOP);
         ChessPiece blackBishop = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.BISHOP);
         //set up bishops
-        ChessPosition whiteB_L = new ChessPosition(1, 3);
-        ChessPosition whiteB_R = new ChessPosition(1, 6);
-        ChessPosition blackB_L = new ChessPosition(8, 3);
-        ChessPosition blackB_R = new ChessPosition(8, 6);
-        addPiece(whiteB_L, whiteBishop);
-        addPiece(whiteB_R, whiteBishop);
-        addPiece(blackB_L, blackBishop);
-        addPiece(blackB_R, blackBishop);
+        ChessPosition whiteBL = new ChessPosition(1, 3);
+        ChessPosition whiteBR = new ChessPosition(1, 6);
+        ChessPosition blackBL = new ChessPosition(8, 3);
+        ChessPosition blackBR = new ChessPosition(8, 6);
+        addPiece(whiteBL, whiteBishop);
+        addPiece(whiteBR, whiteBishop);
+        addPiece(blackBL, blackBishop);
+        addPiece(blackBR, blackBishop);
         //create queens
         ChessPiece whiteQueen = new ChessPiece(ChessGame.TeamColor.WHITE, ChessPiece.PieceType.QUEEN);
         ChessPiece blackQueen = new ChessPiece(ChessGame.TeamColor.BLACK, ChessPiece.PieceType.QUEEN);

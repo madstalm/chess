@@ -22,8 +22,8 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         ChessGame that = (ChessGame) o;
         return Objects.equals(game, that.game) && turn == that.turn; 
     }
@@ -109,7 +109,8 @@ public class ChessGame {
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
-     * A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger, or if it’s not the corresponding team's turn.
+     * A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger,
+     *  or if it’s not the corresponding team's turn.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         ChessPiece myPiece = game.getPiece(move.getStartPosition());

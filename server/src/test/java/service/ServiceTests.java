@@ -78,7 +78,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("registerUser() negative")
-    public void registerUserService_N() throws Exception {
+    public void registerUserServiceN() throws Exception {
         UserData user = new UserData("bob", null, "hecanfix.it");
         assertThrows(InvalidInputException.class,
             () -> userService.registerUser(user));
@@ -95,7 +95,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("createAuth() negative")
-    public void createAuthService_N() throws Exception {
+    public void createAuthServiceN() throws Exception {
         UserData user = new UserData(null, "theBuilder", "hecanfix.it");
         assertThrows(InvalidInputException.class,
             () -> authService.createAuth(user));
@@ -114,7 +114,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("checkLogin() negative")
-    public void checkLoginService_N() throws Exception {
+    public void checkLoginServiceN() throws Exception {
         UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
         userDAO.addUserData(user);
         UserData loginUser = new UserData("bob", "thebuilder", null);
@@ -137,7 +137,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("checkLogout() negative")
-    public void checkLogoutService_N() throws Exception {
+    public void checkLogoutServiceN() throws Exception {
         UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
         userDAO.addUserData(user);
         authService.createAuth(user);
@@ -175,7 +175,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("checkAuth() negative")
-    public void checkAuthService_N() throws Exception {
+    public void checkAuthServiceN() throws Exception {
         AuthData authorization = new AuthData("123456", "bob");
         authDAO.addAuthData(authorization);
         assertThrows(UnauthorizedException.class,
@@ -193,7 +193,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("getGames() negative")
-    public void getGamesService_N() throws Exception {
+    public void getGamesServiceN() throws Exception {
         Collection<GameData> empty = new ArrayList<>();
         Assertions.assertIterableEquals(empty, gameService.getGames(),
                 "getGames() returned games");
@@ -210,7 +210,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("createGame() negative")
-    public void createGameService_N() throws Exception {
+    public void createGameServiceN() throws Exception {
         GameData game = new GameData(null, null, null, null, null);
         assertThrows(DataAccessException.class,
             () -> gameService.gameCreator(game));
@@ -234,7 +234,7 @@ public class ServiceTests {
 
     @Test
     @DisplayName("joinGame() negative")
-    public void joinGameService_N() throws Exception {
+    public void joinGameServiceN() throws Exception {
         GameData game = new GameData(null, null, "scoop", "a game", null);
         Integer gameID = gameService.gameCreator(game);
         UserData user = new UserData("bob", "theBuilder", "he@canfix.it");

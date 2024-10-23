@@ -9,9 +9,9 @@ public class KingMovesCalculator extends PieceMovesCalculator {
         ChessPiece.PieceType promotionPiece = null;
         Collection<ChessMove> moves = new ArrayList<>();
         Collection<ChessPosition> squares = new ArrayList<>();
-        Collection<ChessPosition> proposed_squares = new ArrayList<>();
-        proposed_squares = getProposed(myPosition);
-        squares = validatePositions(board, proposed_squares, myPosition);
+        Collection<ChessPosition> proposedSquares = new ArrayList<>();
+        proposedSquares = getProposed(myPosition);
+        squares = validatePositions(board, proposedSquares, myPosition);
         for (ChessPosition square : squares) {
             moves.add(new ChessMove(myPosition, square, promotionPiece));
         }
