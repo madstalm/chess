@@ -12,9 +12,11 @@ import java.util.Random;
 
 public class AuthService {
     private final AuthDAO dataAccess;
+    private Integer modifier;
 
     public AuthService(AuthDAO dataAccess) {
         this.dataAccess = dataAccess;
+        this.modifier = 0;
     }
 
     public AuthData createAuth(UserData userData) throws Exception {
@@ -43,12 +45,14 @@ public class AuthService {
 
     public void clear() throws DataAccessException {
         dataAccess.deleteAllAuthData();
+        modifier = 0;
     }
 
     private String createToken(String username) {
         long seed = System.currentTimeMillis() + username.hashCode();
         Random random = new Random(seed);
-        return String.valueOf(random.nextInt(Integer.MAX_VALUE));
+        ++modifier;
+        return String.valueOf(random.nextInt(Integer.MAX_VALUE) + modifier);
     }
 
 }
