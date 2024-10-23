@@ -74,7 +74,27 @@ public class PieceMovesCalculator {
         else { return true;
         }
     }
-    
+
+    /**
+     * used by the knight and king move calculators to avoid code duplication
+     *
+     * @param board current chessboard
+     * @param myPosition my piece's position
+     * @param proposedSquares a collection of possible target positions assembled by the getProposed() method
+     */
+    public Collection<ChessMove> kMoves(ChessBoard board, ChessPosition myPosition,
+            Collection<ChessPosition> proposedSquares) {
+        
+        ChessPiece.PieceType promotionPiece = null;
+        Collection<ChessMove> moves = new ArrayList<>();
+        Collection<ChessPosition> squares = new ArrayList<>();
+        squares = validatePositions(board, proposedSquares, myPosition);
+        for (ChessPosition square : squares) {
+            moves.add(new ChessMove(myPosition, square, promotionPiece));
+        }
+        return moves;
+    }
+
     /**
      * used by the knight and king move calculators to see if they can move into a space
      *

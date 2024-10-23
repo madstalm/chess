@@ -6,16 +6,9 @@ import java.util.Collection;
 public class KingMovesCalculator extends PieceMovesCalculator {
 
     public Collection<ChessMove> kingMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece.PieceType promotionPiece = null;
-        Collection<ChessMove> moves = new ArrayList<>();
-        Collection<ChessPosition> squares = new ArrayList<>();
         Collection<ChessPosition> proposedSquares = new ArrayList<>();
         proposedSquares = getProposed(myPosition);
-        squares = validatePositions(board, proposedSquares, myPosition);
-        for (ChessPosition square : squares) {
-            moves.add(new ChessMove(myPosition, square, promotionPiece));
-        }
-        return moves;
+        return kMoves(board, myPosition, proposedSquares);
     }
 
     private static Collection<ChessPosition> getProposed(ChessPosition myPosition) {
