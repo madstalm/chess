@@ -43,7 +43,7 @@ public class AuthService {
         dataAccess.deleteAuthData(authToken);
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws Exception {
         dataAccess.deleteAllAuthData();
         modifier = 0;
     }
