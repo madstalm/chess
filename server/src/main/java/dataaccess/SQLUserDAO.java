@@ -3,31 +3,31 @@ import java.sql.*;
 
 import com.google.gson.Gson;
 
-import model.AuthData;
+import model.UserData;
 
 import static java.sql.Types.NULL;
 
-public class SQLAuthDAO implements AuthDAO {
-    
-    public SQLAuthDAO() throws Exception {
+public class SQLUserDAO implements UserDAO {
+
+    public SQLUserDAO() throws Exception {
         configureDatabase();
     }
-    
-    public AuthData addAuthData(AuthData authData) throws Exception {
-        var statement = "INSERT INTO authDB (authToken, authData) VALUES (?, ?)";
-        var json = authData.toString();
-        executeAuthUpdate(statement, authData.authToken(), json);
-        return authData;
+
+    public UserData addUserData(UserData userData) throws DataAccessException {
+        var statement = "INSERT INTO userDB (username, userData) VALUES (?, ?)";
+        var json = userData.toString();
+        executeUserUpdate(statement, userData.username(), json);
+        return userData;
     }
 
-    public AuthData getAuthData(String authToken) throws Exception{
+    public UserData getUserData(String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            var statement = "SELECT authToken, authData FROM authDB WHERE authToken=?";
+            var statement = "SELECT username, userData FROM userDB WHERE username=?";
             try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, authToken);
+                ps.setString(1, username);
                 try (var rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        return fetchAuthData(rs);
+                        return fetchUserData(rs);
                     }
                 }
             }
@@ -37,24 +37,18 @@ public class SQLAuthDAO implements AuthDAO {
         return null;
     }
 
-    public void deleteAuthData(String authToken) throws Exception {
-        var statement = "DELETE FROM authDB WHERE authToken=?";
-        executeAuthUpdate(statement, authToken);
+    public void deleteAllUsers() throws DataAccessException {
+        var statement = "TRUNCATE userDB";
+        executeUserUpdate(statement);
     }
 
-    public void deleteAllAuthData() throws Exception {
-        var statement = "TRUNCATE authDB";
-        executeAuthUpdate(statement);
+    private UserData fetchUserData(ResultSet rs) throws SQLException {
+        var json = rs.getString("userData");
+        var userData = new Gson().fromJson(json, UserData.class);
+        return userData;
     }
 
-    private AuthData fetchAuthData(ResultSet rs) throws SQLException {
-        //var token = rs.getInt("authToken");
-        var json = rs.getString("authData");
-        var authData = new Gson().fromJson(json, AuthData.class);
-        return authData;
-    }
-
-    private void executeAuthUpdate(String statement, Object... params) throws Exception {
+    private void executeUserUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement)) {
                 for (var i = 0; i < params.length; i++) {
@@ -70,10 +64,10 @@ public class SQLAuthDAO implements AuthDAO {
 
     private final String[] createStatements = {
             """
-            CREATE TABLE IF NOT EXISTS  authDB (
-              `authToken` varchar(256) NOT NULL,
-              `authData` TEXT NOT NULL,
-              PRIMARY KEY (`authToken`)
+            CREATE TABLE IF NOT EXISTS  userDB (
+              `username` varchar(256) NOT NULL,
+              `userData` TEXT NOT NULL,
+              PRIMARY KEY (`username`)
             )
             """
     };
