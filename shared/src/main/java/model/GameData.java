@@ -21,4 +21,5 @@ public record GameData(Integer gameID, String whiteUsername, String blackUsernam
     public GameData setGameID(int id) {
         return new GameData(id, this.whiteUsername, this.blackUsername, this.gameName, this.game);
     }
+
 }
