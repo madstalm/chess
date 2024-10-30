@@ -15,7 +15,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public GameData addGame(GameData game) throws DataAccessException {
-        var statement = "INSERT INTO gameDB (gameId, gameData) VALUES (?, ?)";
+        var statement = "INSERT INTO gameDB (gameData) VALUES (?)";
         game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), new ChessGame());
         var gameId = DatabaseManager.executeUpdate(statement, null, game);
         return game.setGameID(gameId);
@@ -75,5 +75,7 @@ public class SQLGameDAO implements GameDAO {
         var gameData = new Gson().fromJson(json, GameData.class);
         return gameData;
     }
+
+
 
 }

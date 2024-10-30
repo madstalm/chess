@@ -4,6 +4,7 @@ import java.sql.*;
 import java.util.Properties;
 
 import static java.sql.Types.NULL;
+import static java.sql.Statement.RETURN_GENERATED_KEYS;
 
 public class DatabaseManager {
     private static final String DATABASE_NAME;
@@ -79,19 +80,23 @@ public class DatabaseManager {
           `authToken` varchar(256) NOT NULL,
           `authData` TEXT NOT NULL,
           PRIMARY KEY (`authToken`)
-        )
-
+        );
+        """,
+        
+        """
         CREATE TABLE IF NOT EXISTS  userDB (
               `username` varchar(256) NOT NULL,
               `userData` TEXT NOT NULL,
               PRIMARY KEY (`username`)
-        )
-
+        );
+        """,
+                
+        """
         CREATE TABLE IF NOT EXISTS  gameDB (
               `gameId` int NOT NULL AUTO_INCREMENT,
               `gameData` TEXT DEFAULT NULL,
               PRIMARY KEY (`gameId`)
-        )
+        );
         """
     };
     
@@ -110,15 +115,16 @@ public class DatabaseManager {
 
     public static int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
+            try (var ps = conn.prepareStatement(statement, RETURN_GENERATED_KEYS)) {
                 for (var i = 0; i < params.length; i++) {
                     var param = params[i];
                     if (param instanceof String p) { ps.setString(i + 1, p); }
                     else if (param instanceof Integer p) { ps.setInt(i + 1, p); }
                     else if (param == null) { ps.setNull(i + 1, NULL); }
                 }
+                ps.executeUpdate();
 
-            var rs = ps.getGeneratedKeys();
+                var rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
@@ -129,4 +135,5 @@ public class DatabaseManager {
             throw new DataAccessException("Error: " + ex.getMessage());
         }
     }
+
 }
