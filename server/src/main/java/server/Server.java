@@ -27,10 +27,16 @@ public class Server {
         dataaccess.AuthDAO authDAO = new dataaccess.MemoryAuthDAO();
         dataaccess.GameDAO gameDAO = new dataaccess.MemoryGameDAO();
         dataaccess.UserDAO userDAO = new dataaccess.MemoryUserDAO();
-        if (startWithSQL) { //I'm not writing the SQL stuff now, but this will be changed to ex. SQLAuthDAO in the appropriate phase
-            authDAO = new dataaccess.MemoryAuthDAO();
-            gameDAO = new dataaccess.MemoryGameDAO();
-            userDAO = new dataaccess.MemoryUserDAO();
+        if (startWithSQL) {
+            try {
+                authDAO = new dataaccess.SQLAuthDAO();
+                gameDAO = new dataaccess.SQLGameDAO();
+                userDAO = new dataaccess.SQLUserDAO();
+            }
+            catch (Exception ex) {
+                System.err.println("Error initializing SQL DAOs, defaulting to memory DAOs: " + ex.getMessage());
+                ex.printStackTrace();
+            }
         }
         this.authService = new AuthService(authDAO);
         this.gameService = new GameService(gameDAO);
@@ -41,6 +47,15 @@ public class Server {
         dataaccess.AuthDAO authDAO = new dataaccess.MemoryAuthDAO();
         dataaccess.GameDAO gameDAO = new dataaccess.MemoryGameDAO();
         dataaccess.UserDAO userDAO = new dataaccess.MemoryUserDAO();
+        try {
+            authDAO = new dataaccess.SQLAuthDAO();
+            gameDAO = new dataaccess.SQLGameDAO();
+            userDAO = new dataaccess.SQLUserDAO();
+        }
+        catch (Exception ex) {
+            System.err.println("Error initializing SQL DAOs, defaulting to memory DAOs: " + ex.getMessage());
+            ex.printStackTrace();
+        }
         this.authService = new AuthService(authDAO);
         this.gameService = new GameService(gameDAO);
         this.userService = new UserService(userDAO);
