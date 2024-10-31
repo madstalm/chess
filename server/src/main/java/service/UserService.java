@@ -10,6 +10,8 @@ import dataaccess.UnauthorizedException;
 import java.util.Collection;
 import java.util.regex.Pattern;
 
+import org.mindrot.jbcrypt.BCrypt;
+
 public class UserService {
     private final UserDAO dataAccess;
 
@@ -36,7 +38,8 @@ public class UserService {
             throw new InvalidInputException("Error: invalid email");
         }
         */
-        dataAccess.addUserData(user);
+        String hash = BCrypt.hashpw(user.password(), BCrypt.gensalt());
+        dataAccess.addUserData(new UserData(user.username(), hash, user.email()));
         return user;
     }
 
@@ -51,7 +54,7 @@ public class UserService {
             throw new UnauthorizedException("Error: unauthorized");
         }
         String checkPassword = checkUser.password();
-        if (!checkPassword.equals(password)) {
+        if (!BCrypt.checkpw(password, checkPassword)) {
             throw new UnauthorizedException("Error: unauthorized");
         }
         return checkUser;
