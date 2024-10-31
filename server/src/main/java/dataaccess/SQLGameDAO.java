@@ -16,6 +16,9 @@ public class SQLGameDAO implements GameDAO {
 
     public GameData addGame(GameData game) throws DataAccessException {
         var statement = "INSERT INTO gameDB (gameData) VALUES (?)";
+        if ((game == null)||(game.gameName() == null)) {
+            throw new DataAccessException("Error: invalid game was passed to DAO");
+        }
         game = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName(), new ChessGame());
         var gameId = DatabaseManager.executeUpdate(statement, new Gson().toJson(game));
         game = game.setGameID(gameId);
@@ -58,6 +61,9 @@ public class SQLGameDAO implements GameDAO {
     }
 
     public void updateGameData(GameData game) throws DataAccessException {
+        if ((game == null)||(game.gameName() == null)||(getGameData(game.gameID()) == null)) {
+            throw new DataAccessException("Error: invalid game was passed to DAO");
+        }
         var statement = "UPDATE gameDB SET gameData=? WHERE gameId=?";
         DatabaseManager.executeUpdate(statement, new Gson().toJson(game), game.gameID());
     }

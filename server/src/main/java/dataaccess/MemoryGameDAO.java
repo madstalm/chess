@@ -31,7 +31,10 @@ public class MemoryGameDAO implements GameDAO {
         return games.values();
     }
 
-    public void updateGameData(GameData game) {
+    public void updateGameData(GameData game) throws DataAccessException {
+        if ((game == null)||(game.gameName() == null)||(getGameData(game.gameID()) == null)) {
+            throw new DataAccessException("Error: invalid game was passed to DAO");
+        }
         games.put(game.gameID(), game);
     }
 
