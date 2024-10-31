@@ -22,6 +22,7 @@ import model.UserData;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
+import org.mindrot.jbcrypt.BCrypt;
 
 import chess.ChessGame;
 
@@ -72,7 +73,7 @@ public class ServiceTests {
         UserData testReturn = userService.registerUser(user);
         Assertions.assertEquals(user.username(), testReturn.username(), 
                 "Response did not give the same username as user");
-        Assertions.assertEquals(userDAO.getUserData("bob").password(), "theBuilder", 
+        Assertions.assertEquals(userDAO.getUserData("bob").email(), "he@canfix.it", 
                 "password was not recorded in Memory");
     }
 
@@ -104,18 +105,18 @@ public class ServiceTests {
     @Test
     @DisplayName("checkLogin() positive")
     public void checkLoginService() throws Exception {
-        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        UserData user = new UserData("bob", BCrypt.hashpw("theBuilder", BCrypt.gensalt()), "he@canfix.it");
         userDAO.addUserData(user);
         UserData loginUser = new UserData("bob", "theBuilder", null);
         UserData checked = userService.checkLogin(loginUser);
-        Assertions.assertEquals(user.password(), checked.password(), 
+        Assertions.assertEquals(checked, userDAO.getUserData("bob"), 
                 "did not return the same user");
     }
 
     @Test
     @DisplayName("checkLogin() negative")
     public void checkLoginServiceN() throws Exception {
-        UserData user = new UserData("bob", "theBuilder", "he@canfix.it");
+        UserData user = new UserData("bob", BCrypt.hashpw("theBuilder", BCrypt.gensalt()), "he@canfix.it");
         userDAO.addUserData(user);
         UserData loginUser = new UserData("bob", "thebuilder", null);
         assertThrows(UnauthorizedException.class,

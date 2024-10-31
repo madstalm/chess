@@ -18,7 +18,7 @@ public class SQLAuthDAO implements AuthDAO {
         return authData;
     }
 
-    public AuthData getAuthData(String authToken) throws Exception{
+    public AuthData getAuthData(String authToken) throws Exception {
         try (var conn = DatabaseManager.getConnection()) {
             var statement = "SELECT authToken, authData FROM authDB WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {
