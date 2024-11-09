@@ -77,27 +77,46 @@ public class DrawBoard {
     }
 
     private static void drawMiddle(PrintStream out, boolean flip) {
-        String[] rows = { " 8 ", " 7 ", " 6 ", " 5 ", " 4 ", " 3 ", " 2 ", " 1 " };
+        String[] rows = { " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 " };
         
         if (flip) {
-            for (int boardRow = BOARD_SIZE_IN_SQUARES-1; boardRow >= 0; --boardRow) {
-                printHeaderText(out, rows[boardRow]);
+            for (int boardRow = 1; boardRow <= BOARD_SIZE_IN_SQUARES; ++boardRow) {
+                printHeaderText(out, rows[boardRow-1]);
                 drawRowOfSquares(out, flip, boardRow);
-                printHeaderText(out, rows[boardRow]);
+                printHeaderText(out, rows[boardRow-1]);
+                out.println();
             }
         }
         else {
-            for (int boardRow = 0; boardRow < BOARD_SIZE_IN_SQUARES; ++boardRow) {
-                printHeaderText(out, rows[boardRow]);
+            for (int boardRow = BOARD_SIZE_IN_SQUARES; boardRow > 0; --boardRow) {
+                printHeaderText(out, rows[boardRow-1]);
                 drawRowOfSquares(out, flip, boardRow);
-                printHeaderText(out, rows[boardRow]);
+                printHeaderText(out, rows[boardRow-1]);
+                out.println();
             }
         }
-
     }
 
     private static void drawRowOfSquares(PrintStream out, boolean flip, int row) {
+        //true is white squares, this is good for even rows
+        boolean[] colors = { true, false, true, false, true, false, true, false };
+        if (isEven(row)) {
+            
+        }
+        else {
+            //colors = new boolean[] { false, true, false, true, false, true, false, true };
+        }
+        if (flip) {
+            for (int boardCol = BOARD_SIZE_IN_SQUARES; boardCol >= 1; --boardCol) {
+                
+            }
+        }
+        else {
+            for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
 
+            }
+        }
+        
         for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
             for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
                 setWhite(out);
@@ -129,6 +148,10 @@ public class DrawBoard {
 
     private ChessPiece getPieceAt(int row, int col) {
         return this.board.getPiece(new ChessPosition(row, col));
+    }
+
+    private static boolean isEven(int number) {
+        return number % 2 == 0;
     }
 
     private static void setBlack(PrintStream out) {
