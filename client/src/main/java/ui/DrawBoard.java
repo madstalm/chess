@@ -9,8 +9,8 @@ import chess.ChessPiece;
 import chess.ChessPosition;
 
 public class DrawBoard {
-    private ChessGame game;
-    private ChessBoard board;
+    private static ChessGame game;
+    private static ChessBoard board;
 
     // Board dimensions.
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -18,16 +18,16 @@ public class DrawBoard {
 
     // Padded characters.
     private static final String EMPTY = "   ";
-    private static final String KING = " K ";
-    private static final String QUEEN = " Q ";
-    private static final String BISHOP = " B ";
-    private static final String KNIGHT = " N ";
-    private static final String ROOK = " R ";
-    private static final String PAWN = " P ";
+    private static final String K = " K ";
+    private static final String Q = " Q ";
+    private static final String B = " B ";
+    private static final String N = " N ";
+    private static final String R = " R ";
+    private static final String P = " P ";
 
     public DrawBoard(ChessGame chessGame) {
-        this.game = chessGame;
-        this.board = this.game.getBoard();
+        game = chessGame;
+        board = game.getBoard();
     }
 
     public static void display(ChessGame.TeamColor pov) {
@@ -100,11 +100,8 @@ public class DrawBoard {
     private static void drawRowOfSquares(PrintStream out, boolean flip, int row) {
         //true is white squares, this is good for even rows
         boolean[] colors = { true, false, true, false, true, false, true, false };
-        if (isEven(row)) {
-            
-        }
-        else {
-            //colors = new boolean[] { false, true, false, true, false, true, false, true };
+        if (!isEven(row)) {
+            colors = new boolean[] { false, true, false, true, false, true, false, true };
         }
         if (flip) {
             for (int boardCol = BOARD_SIZE_IN_SQUARES; boardCol >= 1; --boardCol) {
@@ -113,41 +110,52 @@ public class DrawBoard {
         }
         else {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
-
-            }
-        }
-        
-        for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
-            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                setWhite(out);
-
-                if (squareRow == SQUARE_SIZE_IN_PADDED_CHARS / 2) {
-                    int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-                    int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
-
-                    out.print(EMPTY.repeat(prefixLength));
-                    printPlayer(out, rand.nextBoolean() ? X : O);
-                    out.print(EMPTY.repeat(suffixLength));
+                if (colors[boardCol-1]) {
+                    out.print(SET_BG_COLOR_LIGHT_GREY);
                 }
                 else {
-                    out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+                    out.print(SET_BG_COLOR_BLUE);
                 }
-
-                if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                    // Draw vertical column separator.
-                    setRed(out);
-                    out.print(EMPTY.repeat(LINE_WIDTH_IN_PADDED_CHARS));
+                ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
+                if (currentPiece == null) {
+                    out.print(EMPTY);
                 }
-
-                setBlack(out);
+                else {
+                    ChessPiece.PieceType type = currentPiece.getPieceType();
+                    ChessGame.TeamColor team = currentPiece.getTeamColor();
+                    switch (team) {
+                        case WHITE:
+                            out.print(SET_TEXT_COLOR_WHITE);
+                            break;
+                        case BLACK:
+                            out.print(SET_TEXT_COLOR_BLACK);
+                            break;
+                    }
+                    switch (type) {
+                        case KING:
+                            out.print(K);
+                            break;
+                        case QUEEN:
+                            out.print(Q);
+                            break;
+                        case BISHOP:
+                            out.print(B);
+                            break;
+                        case KNIGHT:
+                            out.print(N);
+                            break;
+                        case ROOK:
+                            out.print(R);
+                            break;
+                        case PAWN:
+                            out.print(P);
+                            break;
+                    }
+                } 
             }
-
-            out.println();
         }
-    }
-
-    private ChessPiece getPieceAt(int row, int col) {
-        return this.board.getPiece(new ChessPosition(row, col));
+        setBlack(out);
+        out.println();
     }
 
     private static boolean isEven(int number) {
