@@ -14,7 +14,6 @@ public class DrawBoard {
 
     // Board dimensions.
     private static final int BOARD_SIZE_IN_SQUARES = 8;
-    private static final int SQUARE_SIZE_IN_PADDED_CHARS = 3;
 
     // Padded characters.
     private static final String EMPTY = "   ";
@@ -30,7 +29,7 @@ public class DrawBoard {
         board = game.getBoard();
     }
 
-    public static void display(ChessGame.TeamColor pov) {
+    public void display(ChessGame.TeamColor pov) {
         var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
         out.print(ERASE_SCREEN);
@@ -47,6 +46,9 @@ public class DrawBoard {
                 drawAlphaHeaders(out, true);
                 break;
         }
+
+        out.print(SET_BG_COLOR_BLACK);
+        out.print(SET_TEXT_COLOR_WHITE);
     }
 
     private static void drawAlphaHeaders(PrintStream out, boolean flip) {
@@ -100,18 +102,13 @@ public class DrawBoard {
     private static void drawRowOfSquares(PrintStream out, boolean flip, int row) {
         //true is white squares, this is good for even rows
         boolean[] colors = { true, false, true, false, true, false, true, false };
-        if (!isEven(row)) {
+        if ((!isEven(row) && !flip) || (isEven(row) && flip)) {
             colors = new boolean[] { false, true, false, true, false, true, false, true };
         }
         if (flip) {
             for (int boardCol = BOARD_SIZE_IN_SQUARES; boardCol >= 1; --boardCol) {
-                
-            }
-        }
-        else {
-            for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
                 if (colors[boardCol-1]) {
-                    out.print(SET_BG_COLOR_LIGHT_GREY);
+                    out.print(SET_BG_COLOR_YELLOW);
                 }
                 else {
                     out.print(SET_BG_COLOR_BLUE);
@@ -125,9 +122,12 @@ public class DrawBoard {
                     ChessGame.TeamColor team = currentPiece.getTeamColor();
                     switch (team) {
                         case WHITE:
-                            out.print(SET_TEXT_COLOR_WHITE);
+                            out.print(RESET_TEXT_COLOR);
+                            out.print(SET_TEXT_BOLD);
+                            out.print(SET_TEXT_COLOR_BRIGHT_WHITE);
                             break;
                         case BLACK:
+                            out.print(RESET_TEXT_COLOR);
                             out.print(SET_TEXT_COLOR_BLACK);
                             break;
                     }
@@ -151,11 +151,61 @@ public class DrawBoard {
                             out.print(P);
                             break;
                     }
-                } 
+                }
+                out.print(RESET_TEXT_BOLD_FAINT);
+            }
+        }
+        else {
+            for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
+                if (colors[boardCol-1]) {
+                    out.print(SET_BG_COLOR_YELLOW);
+                }
+                else {
+                    out.print(SET_BG_COLOR_BLUE);
+                }
+                ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
+                if (currentPiece == null) {
+                    out.print(EMPTY);
+                }
+                else {
+                    ChessPiece.PieceType type = currentPiece.getPieceType();
+                    ChessGame.TeamColor team = currentPiece.getTeamColor();
+                    switch (team) {
+                        case WHITE:
+                            out.print(RESET_TEXT_COLOR);
+                            out.print(SET_TEXT_BOLD);
+                            out.print(SET_TEXT_COLOR_BRIGHT_WHITE);
+                            break;
+                        case BLACK:
+                            out.print(RESET_TEXT_COLOR);
+                            out.print(SET_TEXT_COLOR_BLACK);
+                            break;
+                    }
+                    switch (type) {
+                        case KING:
+                            out.print(K);
+                            break;
+                        case QUEEN:
+                            out.print(Q);
+                            break;
+                        case BISHOP:
+                            out.print(B);
+                            break;
+                        case KNIGHT:
+                            out.print(N);
+                            break;
+                        case ROOK:
+                            out.print(R);
+                            break;
+                        case PAWN:
+                            out.print(P);
+                            break;
+                    }
+                }
+                out.print(RESET_TEXT_BOLD_FAINT); 
             }
         }
         setBlack(out);
-        out.println();
     }
 
     private static boolean isEven(int number) {
