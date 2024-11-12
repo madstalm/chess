@@ -10,6 +10,7 @@ public class Main {
             testServer.run(8080);
         }
         else {
+            //if I wanted to, I could specify args[0] with a port or something like that, unless that is the function call itself
             server.Server testServer = new server.Server();
             testServer.run(8080);
         }
