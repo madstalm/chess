@@ -26,7 +26,7 @@ public class Client {
                 case "register" -> register(params);
                 case "logout" -> logout();
                 case "creategame" -> createGame(params);
-                case "listgames" -> listGames(params);
+                case "listgames" -> listGames();
                 case "playgame" -> playGame();
                 case "observegame" -> observeGame();
                 case "quit" -> "quit";
@@ -46,10 +46,18 @@ public class Client {
         throw new ClientException("Expected: <username> <password>");
     }
 
+    public String register(String... params) throws ClientException {
+
+    }
+
     public String logout() throws ClientException {
         assertLoggedIn();
         loggedIn = false;
         return String.format("Thanks for playing, %s", visitorName);
+    }
+
+    public String createGame(String... params) throws ClientException {
+
     }
 
     public String listGames() throws ClientException {
@@ -61,6 +69,14 @@ public class Client {
             result.append(gson.toJson(game)).append('\n');
         }
         return result.toString();
+    }
+
+    public String playGame(String... params) throws ClientException {
+
+    }
+
+    public String observeGame(String... params) throws ClientException {
+        
     }
     
 
