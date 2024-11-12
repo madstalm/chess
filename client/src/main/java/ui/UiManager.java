@@ -14,7 +14,8 @@ public class UiManager {
     }
 
     public void run() {
-        System.out.println("Welcome to the 240 " + WHITE_KING + "chess" + BLACK_KING + "client.\nPlease type in an option from below to begin.");
+        System.out.println("Welcome to the 240 " + WHITE_KING + "chess" + BLACK_KING +
+                "client.\nPlease type in an option from below to begin.");
         System.out.print(client.help());
 
         Scanner scanner = new Scanner(System.in);

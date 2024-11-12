@@ -81,13 +81,28 @@ public class Client {
 
     public String logout() throws ClientException {
         assertLoggedIn();
-        token = null;
-        loggedIn = false;
-        return String.format("Thanks for playing, %s", visitorName);
+        try {
+            server.logout(token);
+            token = null;
+            loggedIn = false;
+            return "Thanks for playing";
+        }
+        catch (Exception e) {
+            throw new ClientException(e.getMessage());
+        }
     }
 
     public String createGame(String... params) throws ClientException {
-
+        assertLoggedIn();
+        if (params.length == 1) {
+            GameData game = new GameData(null, null, null, params[0], null);
+            try {
+                int gameID = server.createGame(game, token);
+                //not sure what to do next? Some kind of a mapping system that stays consistent and updates when new games are created or something I guess
+            }
+            
+        }
+        throw new ClientException("Expected: <game name>");
     }
 
     public String listGames() throws ClientException {
