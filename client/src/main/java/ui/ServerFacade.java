@@ -24,12 +24,12 @@ public class ServerFacade {
         return this.makeRequest("POST", path, null, user, AuthData.class);
     }
 
-    public void logout() throws ClientException {//needs to accept an authToken parameter
+    public void logout(AuthData token) throws ClientException {//needs to accept an authToken parameter
         var path = "/session";
         this.makeRequest("DELETE", path, token, null, null);
     }
 
-    public GameData[] listGames() throws ClientException {//needs to accept an authtoken parameter
+    public GameData[] listGames(AuthData token) throws ClientException {//needs to accept an authtoken parameter
         var path = "/game";
         record listGamesResponse(GameData[] games) {
         }
@@ -37,7 +37,7 @@ public class ServerFacade {
         return response.games();
     }
 
-    public int createGame(GameData game) throws ClientException {//needs to accept an authtoken parameter
+    public int createGame(GameData game, AuthData token) throws ClientException {//needs to accept an authtoken parameter
         var path = "/game";
         record createGameResponse(int gameID) {
         }
@@ -45,23 +45,24 @@ public class ServerFacade {
         return response.gameID();
     }
 
-    public void joinGame(GameData game) throws ClientException {//needs to accept an authtoken parameter
+    public void joinGame(GameData game, AuthData token) throws ClientException {//needs to accept an authtoken parameter
         var path = "/game";
         this.makeRequest("PUT", path, token, game, null);
     }
 
 
-    private <T> T makeRequest(String method, String path, String token, Object request, Class<T> responseClass) throws ClientException {
+    private <T> T makeRequest(String method, String path, AuthData token, Object request, Class<T> responseClass) throws ClientException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
             if (token != null) {
-                http.addRequestProperty("authorization:", token);
+                http.addRequestProperty("authorization:", token.authToken());
             }
-            
+
             writeBody(request, http);
+            http.setReadTimeout(5000);
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);

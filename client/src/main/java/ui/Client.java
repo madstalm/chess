@@ -1,12 +1,13 @@
 package ui;
 import ui.*;
+import model.*;
 
 import java.util.Arrays;
 
 import com.google.gson.Gson;
 
 public class Client {
-    private String visitorName = null;
+    private AuthData token = null;
     private final ServerFacade server;
     private final String serverUrl;
     private boolean loggedIn = false;
@@ -38,20 +39,49 @@ public class Client {
     }
 
     public String login(String... params) throws ClientException {
-        if (params.length >= 1) {
-            loggedIn = true;
-            visitorName = String.join("-", params);
-            return String.format("You signed in as %s.", visitorName);
+        if (loggedIn) {
+            return "Already logged in";
+        }
+        if (params.length == 2) {
+            String username = params[0];
+            String password = params[1];
+            UserData user = new UserData(username, password, null);
+            try {
+                token = server.login(user);
+                loggedIn = true;
+                return String.format("Welcome %s", username);
+            }
+            catch (Exception e) {
+                throw new ClientException("<username> or <password> incorrect");
+            }
         }
         throw new ClientException("Expected: <username> <password>");
     }
 
     public String register(String... params) throws ClientException {
-
+        if (loggedIn) {
+            return "Already logged in";
+        }
+        if (params.length == 3) {
+            String username = params[0];
+            String password = params[1];
+            String email = params[2];
+            UserData user = new UserData(username, password, email);
+            try {
+                token = server.register(user);
+                loggedIn = true;
+                return String.format("Welcome %s", username);
+            }
+            catch (Exception e) {
+                throw new ClientException("<username>: " + username + " already taken");
+            }
+        }
+        throw new ClientException("Expected: <username> <password> <email>");
     }
 
     public String logout() throws ClientException {
         assertLoggedIn();
+        token = null;
         loggedIn = false;
         return String.format("Thanks for playing, %s", visitorName);
     }
