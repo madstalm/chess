@@ -36,11 +36,17 @@ public class DrawBoard {
 
         switch (pov) {
             case WHITE:
+                drawAlphaHeaders(out, true);
+                drawMiddle(out, true);
+                drawAlphaHeaders(out, true);
                 drawAlphaHeaders(out, false);
                 drawMiddle(out, false);
                 drawAlphaHeaders(out, false);
                 break;
             case BLACK:
+                drawAlphaHeaders(out, false);
+                drawMiddle(out, false);
+                drawAlphaHeaders(out, false); 
                 drawAlphaHeaders(out, true);
                 drawMiddle(out, true);
                 drawAlphaHeaders(out, true);
@@ -102,7 +108,7 @@ public class DrawBoard {
     private static void drawRowOfSquares(PrintStream out, boolean flip, int row) {
         //true is white squares, this is good for even rows
         boolean[] colors = { true, false, true, false, true, false, true, false };
-        if ((!isEven(row) && !flip) || (isEven(row) && flip)) {
+        if ((!isEven(row) && !flip) || (!isEven(row) && flip)) {
             colors = new boolean[] { false, true, false, true, false, true, false, true };
         }
         if (flip) {

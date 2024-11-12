@@ -7,7 +7,6 @@ public class Main {
         System.out.println("♕ 240 Chess Client: " + piece);
         ChessGame game = new ChessGame();
         DrawBoard printer = new DrawBoard(game);
-        //printer.display(ChessGame.TeamColor.BLACK);
-        printer.display(ChessGame.TeamColor.WHITE);
+        printer.display(ChessGame.TeamColor.BLACK);
     }
 }
