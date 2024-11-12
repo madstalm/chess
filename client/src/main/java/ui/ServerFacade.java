@@ -16,48 +16,51 @@ public class ServerFacade {
 
     public AuthData register(UserData user) throws ClientException {
         var path = "/user";
-        return this.makeRequest("POST", path, user, AuthData.class);
+        return this.makeRequest("POST", path, null, user, AuthData.class);
     }
 
     public AuthData login(UserData user) throws ClientException {
         var path = "/session";
-        return this.makeRequest("POST", path, user, AuthData.class);
+        return this.makeRequest("POST", path, null, user, AuthData.class);
     }
 
-    public void logout() throws ClientException {
+    public void logout() throws ClientException {//needs to accept an authToken parameter
         var path = "/session";
-        this.makeRequest("DELETE", path, null, null);
+        this.makeRequest("DELETE", path, token, null, null);
     }
 
-    public GameData[] listGames() throws ClientException {
+    public GameData[] listGames() throws ClientException {//needs to accept an authtoken parameter
         var path = "/game";
         record listGamesResponse(GameData[] games) {
         }
-        var response = this.makeRequest("GET", path, null, listGamesResponse.class);
+        var response = this.makeRequest("GET", path, token, null, listGamesResponse.class);
         return response.games();
     }
 
-    public int createGame(GameData game) throws ClientException {
+    public int createGame(GameData game) throws ClientException {//needs to accept an authtoken parameter
         var path = "/game";
         record createGameResponse(int gameID) {
         }
-        var response = this.makeRequest("POST", path, game, createGameResponse.class);
+        var response = this.makeRequest("POST", path, token, game, createGameResponse.class);
         return response.gameID();
     }
 
-    public void joinGame(GameData game) throws ClientException {
+    public void joinGame(GameData game) throws ClientException {//needs to accept an authtoken parameter
         var path = "/game";
-        this.makeRequest("PUT", path, game, null);
+        this.makeRequest("PUT", path, token, game, null);
     }
 
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws ClientException {
+    private <T> T makeRequest(String method, String path, String token, Object request, Class<T> responseClass) throws ClientException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-
+            if (token != null) {
+                http.addRequestProperty("authorization:", token);
+            }
+            
             writeBody(request, http);
             http.connect();
             throwIfNotSuccessful(http);

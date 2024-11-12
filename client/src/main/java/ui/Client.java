@@ -72,11 +72,11 @@ public class Client {
     }
 
     public String playGame(String... params) throws ClientException {
-
+        assertLoggedIn();
     }
 
     public String observeGame(String... params) throws ClientException {
-        
+        assertLoggedIn();
     }
     
 
