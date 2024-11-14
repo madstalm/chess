@@ -131,10 +131,12 @@ public class Client {
             for (GameData game : games) { //add games from server to local map
                 GameData addGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(),
                         game.gameName(), null);
-                if (!gamesMap.containsValue(addGame)) {
+                if (!gamesNames.containsValue(addGame.gameName())) {
                     ++this.availableGames;
                     gamesMap.put(this.availableGames, addGame);
+                    gamesNames.put(this.availableGames, addGame.gameName());
                 }
+                //need a way to update a game in the map once it has already been added
             }
             for (Map.Entry<Integer, GameData> entry : gamesMap.entrySet()) { //iterate through map to display games
                 result.append(entry.getKey()).append(". ").append(entry.getValue().gameName());
@@ -158,7 +160,7 @@ public class Client {
         }
     }
 
-    public String playGame(String... params) throws ClientException {
+    public String playGame(String... params) throws ClientException {//still always joins black. I need to make sure that the http request isn't funky or something
         assertLoggedIn();
         if (params.length == 2) {
             String paramsRecombined = params[0] + " " + params[1];

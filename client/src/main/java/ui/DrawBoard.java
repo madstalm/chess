@@ -78,7 +78,8 @@ public class DrawBoard {
         for (int boardCol = 0; boardCol < 10; ++boardCol) {
             drawHeader(out, headers[boardCol]);
         }
-
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
         out.println();
     }
 
@@ -90,7 +91,8 @@ public class DrawBoard {
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
         out.print(text);
-        setBlack(out);
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
     }
 
     private static void drawMiddle(PrintWriter out, boolean flip) {
