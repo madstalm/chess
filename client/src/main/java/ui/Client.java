@@ -15,6 +15,7 @@ public class Client {
     private final String serverUrl;
     private boolean loggedIn = false;
     private Map<Integer, GameData> gamesMap = new HashMap<>();
+    private Map<Integer, String> gamesNames = new HashMap<>();
     private int availableGames;
 
     public Client(String serverUrl) {
@@ -34,8 +35,8 @@ public class Client {
                 case "logout" -> logout();
                 case "creategame" -> createGame(params);
                 case "listgames" -> listGames();
-                case "playgame" -> playGame();
-                case "observegame" -> observeGame();
+                case "playgame" -> playGame(params);
+                case "observegame" -> observeGame(params);
                 case "quit" -> quit();
                 default -> help();
             };
@@ -102,17 +103,21 @@ public class Client {
         assertLoggedIn();
         if (params.length == 1) {
             GameData game = new GameData(null, null, null, params[0], null);
-            try {
-                int gameID = server.createGame(game, token);
-                GameData newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(),
-                game.gameName(), null);
-                ++this.availableGames;
-                gamesMap.put(this.availableGames, newGame);
-                return params[0] + " added to available games\n";
+            if (!gamesNames.containsValue(game.gameName())) {
+                try {
+                    int gameID = server.createGame(game, token);
+                    GameData newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(),
+                    game.gameName(), null);
+                    ++this.availableGames;
+                    gamesMap.put(this.availableGames, newGame);
+                    gamesNames.put(this.availableGames, newGame.gameName());
+                    return params[0] + " added to available games\n";
+                }
+                catch (Exception e) {
+                    throw new ClientException("Failed to create game");
+                }
             }
-            catch (Exception e) {
-                throw new ClientException("Failed to create game");
-            }  
+            throw new ClientException(String.format("Game named %s already exists", game.gameName()));
         }
         throw new ClientException("Expected: <game name>");
     }
@@ -194,7 +199,7 @@ public class Client {
     public String observeGame(String... params) throws ClientException {
         assertLoggedIn();
         if (params.length == 1) {
-            if (params[0].matches("\\d")) {
+            if (params[0].matches("\\d+")) {
                 Integer gameNumber = Integer.parseInt(params[0]);
                 GameData game = gamesMap.get(gameNumber);
                 if (game != null) {

@@ -33,6 +33,7 @@ public class UiManager {
             }
         }
         scanner.close();
+        System.out.print(RESET_TEXT_COLOR);
         System.out.println();
     }
 
