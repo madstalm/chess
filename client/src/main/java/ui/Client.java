@@ -1,8 +1,11 @@
 package ui;
 import ui.*;
 import model.*;
+import chess.*;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import com.google.gson.Gson;
 
@@ -11,10 +14,13 @@ public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     private boolean loggedIn = false;
+    private Map<Integer, GameData> gamesMap = new HashMap<>();
+    private int availableGames;
 
     public Client(String serverUrl) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        this.availableGames = 0;
     }
 
     public String eval(String input) {
@@ -98,22 +104,53 @@ public class Client {
             GameData game = new GameData(null, null, null, params[0], null);
             try {
                 int gameID = server.createGame(game, token);
-                //not sure what to do next? Some kind of a mapping system that stays consistent and updates when new games are created or something I guess
+                GameData newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(),
+                game.gameName(), new ChessGame());
+                ++this.availableGames;
+                gamesMap.put( this.availableGames, );
+                return params[0] + " added to available games\n";
             }
-            
+            catch (Exception e) {
+                throw new ClientException("Failed to create game");
+            }  
         }
         throw new ClientException("Expected: <game name>");
     }
 
     public String listGames() throws ClientException {
         assertLoggedIn();
-        var games = server.listGames();
-        var result = new StringBuilder();
-        var gson = new Gson();
-        for (var game : games) {
-            result.append(gson.toJson(game)).append('\n');
+        try {
+            GameData[] games = server.listGames(token);
+            var result = new StringBuilder();
+            result.append("Available games:\n");
+            for (GameData game : games) { //add games from server to local map
+                GameData addGame = new GameData(game.gameID(), game.whiteUsername(), game.blackUsername(),
+                        game.gameName(), null);
+                if (!gamesMap.containsValue(addGame)) {
+                    ++this.availableGames;
+                    gamesMap.put(this.availableGames, addGame);
+                }
+            }
+            for (Map.Entry<Integer, GameData> entry : gamesMap.entrySet()) { //iterate through map to display games
+                result.append(entry.getKey()).append(". ").append(entry.getValue().gameName());
+                String whitePlayer = entry.getValue().whiteUsername();
+                String blackPlayer = entry.getValue().blackUsername();
+                if (whitePlayer != null) {
+                    result.append(" [WHITE: ").append(whitePlayer).append(']');
+                }
+                if (blackPlayer != null) {
+                    result.append(" [BLACK: ").append(blackPlayer).append(']');
+                }
+                if ((whitePlayer == null) && (blackPlayer == null)) {
+                    result.append(" [no players]");
+                }
+                result.append("\n");
+            }
+            return result.toString();
         }
-        return result.toString();
+        catch (Exception e) {
+            throw new ClientException("Failed to retrieve games");
+        }
     }
 
     public String playGame(String... params) throws ClientException {
