@@ -46,7 +46,7 @@ public class Client {
 
     public String login(String... params) throws ClientException {
         if (loggedIn) {
-            return "Already logged in";
+            return "Already logged in\n";
         }
         if (params.length == 2) {
             String username = params[0];
@@ -55,7 +55,7 @@ public class Client {
             try {
                 token = server.login(user);
                 loggedIn = true;
-                return String.format("Welcome %s", username);
+                return String.format("Welcome %s\n", username);
             }
             catch (Exception e) {
                 throw new ClientException("<username> or <password> incorrect");
@@ -66,7 +66,7 @@ public class Client {
 
     public String register(String... params) throws ClientException {
         if (loggedIn) {
-            return "Already logged in";
+            return "Already logged in\n";
         }
         if (params.length == 3) {
             String username = params[0];
@@ -76,7 +76,7 @@ public class Client {
             try {
                 token = server.register(user);
                 loggedIn = true;
-                return String.format("Welcome %s", username);
+                return String.format("Welcome %s\n", username);
             }
             catch (Exception e) {
                 throw new ClientException("<username>: " + username + " already taken");
@@ -91,7 +91,7 @@ public class Client {
             server.logout(token);
             token = null;
             loggedIn = false;
-            return "Thanks for playing";
+            return "Thanks for playing \n";
         }
         catch (Exception e) {
             throw new ClientException(e.getMessage());
@@ -153,8 +153,40 @@ public class Client {
         }
     }
 
-    public String playGame(String... params) throws ClientException {
+    public void playGame(String... params) throws ClientException {
         assertLoggedIn();
+        if (params.length == 2) {
+            String paramsRecombined = params[0] + " " + params[1];
+            if (paramsRecombined.matches("\\d+\\s+(?i)(white|black)")) {
+                String team = params[1].toUpperCase();
+                Integer gameNumber = Integer.parseInt(params[0]);
+                GameData game = gamesMap.get(gameNumber);
+                if (game != null) {
+                    try {
+                        if (team == "WHITE") {
+                            game = game.setWhitePlayer(token.username());
+                        }
+                        else {
+                            game = game.setBlackPlayer(token.username());
+                        }
+                        server.joinGame( , token);
+                    }
+                    catch (Exception e) {
+
+                    }
+                }
+                else {
+                    throw new ClientException(String.format("Game %s does not exist", gameNumber));
+                }
+
+            }
+            else {
+                throw new ClientException("<game number> should be an integer\nTeam color should be either WHITE or BLACK");
+            }
+        }
+        else {
+            throw new ClientException("Expected: <game number> <WHITE|BLACK>");
+        }
     }
 
     public String observeGame(String... params) throws ClientException {
@@ -176,8 +208,8 @@ public class Client {
                     - logout
                     - createGame <game name>
                     - listGames
-                    - playGame <game name> <team color>
-                    - observeGame <game name>
+                    - playGame <game number> <[WHITE|BLACK]>
+                    - observeGame <game number>
                 """;
     }
 
