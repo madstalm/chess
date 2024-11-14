@@ -166,22 +166,24 @@ public class Client {
         if (params.length == 2) {
             String paramsRecombined = params[0] + " " + params[1];
             if (paramsRecombined.matches("\\d+\\s+(?i)(white|black)")) {
-                String team = params[1].toUpperCase();
                 Integer gameNumber = Integer.parseInt(params[0]);
                 GameData game = gamesMap.get(gameNumber);
                 if (game != null) {
                     try {
                         JoinGameRequest request = new JoinGameRequest(null, game.gameID());
                         DrawBoard artist = new DrawBoard(new ChessGame());
-                        if (team == "WHITE") {
+                        if (params[1].matches("(?i)\\s*white\\s*")) {
                             request = request.setPlayerColor(ChessGame.TeamColor.WHITE);
                             server.joinGame(request, token);
                             return artist.display(ChessGame.TeamColor.WHITE);
                         }
-                        else {
+                        else  if (params[1].matches("(?i)\\s*black\\s*")){
                             request = request.setPlayerColor(ChessGame.TeamColor.BLACK);
                             server.joinGame(request, token);
                             return artist.display(ChessGame.TeamColor.BLACK);
+                        }
+                        else {
+                            throw new ClientException("Unable to recognize team color");
                         }
                     }
                     catch (Exception e) {
