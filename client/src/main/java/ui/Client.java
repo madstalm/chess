@@ -14,8 +14,19 @@ public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     private boolean loggedIn = false;
+    /**
+     * stores localID as key, GameData as value.
+     * GameData does not store a ChessGame instance.
+    */
     private Map<Integer, GameData> gamesMap = new HashMap<>();
+    /**
+     * stores localID as key, gameName as value
+    */
     private Map<Integer, String> gamesNames = new HashMap<>();
+    /**
+     * stores gameID as key, localID as value
+    */
+    private Map<Integer, Integer> gamesIDs = new HashMap<>();
     private int availableGames;
 
     public Client(String serverUrl) {
@@ -111,6 +122,7 @@ public class Client {
                     ++this.availableGames;
                     gamesMap.put(this.availableGames, newGame);
                     gamesNames.put(this.availableGames, newGame.gameName());
+                    gamesIDs.put(gameID, this.availableGames);
                     return params[0] + " added to available games\n";
                 }
                 catch (Exception e) {
@@ -135,25 +147,14 @@ public class Client {
                     ++this.availableGames;
                     gamesMap.put(this.availableGames, addGame);
                     gamesNames.put(this.availableGames, addGame.gameName());
+                    gamesIDs.put(addGame.gameID(), this.availableGames);
                 }
-                //need a way to update a game in the map once it has already been added
+                else {//update the game if already stored locally
+                    Integer localID = gamesIDs.get(addGame.gameID());
+                    gamesMap.put(localID, addGame);
+                }
             }
-            for (Map.Entry<Integer, GameData> entry : gamesMap.entrySet()) { //iterate through map to display games
-                result.append(entry.getKey()).append(". ").append(entry.getValue().gameName());
-                String whitePlayer = entry.getValue().whiteUsername();
-                String blackPlayer = entry.getValue().blackUsername();
-                if (whitePlayer != null) {
-                    result.append(" [WHITE: ").append(whitePlayer).append(']');
-                }
-                if (blackPlayer != null) {
-                    result.append(" [BLACK: ").append(blackPlayer).append(']');
-                }
-                if ((whitePlayer == null) && (blackPlayer == null)) {
-                    result.append(" [no players]");
-                }
-                result.append("\n");
-            }
-            return result.toString();
+            return gameLister(result).toString();
         }
         catch (Exception e) {
             throw new ClientException("Failed to retrieve games");
@@ -244,6 +245,25 @@ public class Client {
                     - playGame <game number> <[WHITE|BLACK]>
                     - observeGame <game number>
                 """;
+    }
+
+    private StringBuilder gameLister(StringBuilder result) {
+        for (Map.Entry<Integer, GameData> entry : gamesMap.entrySet()) { //iterate through map to display games
+            result.append(entry.getKey()).append(". ").append(entry.getValue().gameName());
+            String whitePlayer = entry.getValue().whiteUsername();
+            String blackPlayer = entry.getValue().blackUsername();
+            if (whitePlayer != null) {
+                result.append(" [WHITE: ").append(whitePlayer).append(']');
+            }
+            if (blackPlayer != null) {
+                result.append(" [BLACK: ").append(blackPlayer).append(']');
+            }
+            if ((whitePlayer == null) && (blackPlayer == null)) {
+                result.append(" [no players]");
+            }
+            result.append("\n");
+        }
+        return result;
     }
 
     private void assertLoggedIn() throws ClientException {
