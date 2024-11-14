@@ -99,25 +99,40 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("logout")
     public void logoutTest() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        AuthData auth = facade.register(newUser);
+        Assertions.assertDoesNotThrow(() -> facade.logout(auth));
     }
 
     @Test
     @DisplayName("logout negative")
     public void logoutTestNegative() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        facade.register(newUser);
+        AuthData badAuth = new AuthData("clearly wrong", newUser.username());
+        Assertions.assertThrows(Exception.class,
+                () -> facade.logout(badAuth));
     }
 
     @Test
     @DisplayName("listGames")
     public void listGamesTest() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        AuthData auth = facade.register(newUser);
+        GameData newGame = new GameData(null, null, null, "newGame", null);
+        facade.createGame(newGame, auth);
+        Assertions.assertEquals(newGame.gameName(), facade.listGames(auth)[0].gameName(),
+                "Did not return the only game created");
     }
 
     @Test
     @DisplayName("listGames negative")
     public void listGamesTestNegative() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        facade.register(newUser);
+        AuthData badAuth = new AuthData("clearly wrong", newUser.username());
+        Assertions.assertThrows(Exception.class,
+                () -> facade.listGames(badAuth));
     }
 
     @Test
