@@ -1,5 +1,7 @@
 package client;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import java.io.*;
 import java.net.*;
 
@@ -138,13 +140,21 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("createGame")
     public void createGameTest() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        AuthData auth = facade.register(newUser);
+        GameData newGame = new GameData(null, null, null, "newGame", null);
+        Object result = facade.createGame(newGame, auth);
+        assertTrue(result instanceof Integer, "Expected result to be a gameID (Integer)");
     }
 
     @Test
     @DisplayName("createGame negative")
     public void createGameTestNegative() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        AuthData auth = facade.register(newUser);
+        GameData newGame = new GameData(null, null, null, "", null);
+        Assertions.assertThrows(Exception.class, 
+                () -> facade.createGame(newGame, auth));
     }
 
     @Test

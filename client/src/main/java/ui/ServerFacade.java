@@ -24,12 +24,12 @@ public class ServerFacade {
         return this.makeRequest("POST", path, null, user, AuthData.class);
     }
 
-    public void logout(AuthData token) throws ClientException {//needs to accept an authToken parameter
+    public void logout(AuthData token) throws ClientException {
         var path = "/session";
         this.makeRequest("DELETE", path, token, null, null);
     }
 
-    public GameData[] listGames(AuthData token) throws ClientException {//needs to accept an authtoken parameter
+    public GameData[] listGames(AuthData token) throws ClientException {
         var path = "/game";
         record listGamesResponse(GameData[] games) {
         }
@@ -37,15 +37,18 @@ public class ServerFacade {
         return response.games();
     }
 
-    public int createGame(GameData game, AuthData token) throws ClientException {//needs to accept an authtoken parameter
+    public int createGame(GameData game, AuthData token) throws ClientException {
         var path = "/game";
         record createGameResponse(int gameID) {
+        }
+        if ((game.gameName() == null) || (game.gameName() == "")) {
+            throw new ClientException("no gameName specified");
         }
         var response = this.makeRequest("POST", path, token, game, createGameResponse.class);
         return response.gameID();
     }
 
-    public void joinGame(JoinGameRequest game, AuthData token) throws ClientException {//needs to accept an authtoken parameter
+    public void joinGame(JoinGameRequest game, AuthData token) throws ClientException {
         var path = "/game";
         this.makeRequest("PUT", path, token, game, null);
     }
