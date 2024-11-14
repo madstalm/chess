@@ -45,7 +45,7 @@ public class ServerFacade {
         return response.gameID();
     }
 
-    public void joinGame(GameData game, AuthData token) throws ClientException {//needs to accept an authtoken parameter
+    public void joinGame(JoinGameRequest game, AuthData token) throws ClientException {//needs to accept an authtoken parameter
         var path = "/game";
         this.makeRequest("PUT", path, token, game, null);
     }

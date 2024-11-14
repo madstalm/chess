@@ -153,7 +153,7 @@ public class Client {
         }
     }
 
-    public void playGame(String... params) throws ClientException {
+    public String playGame(String... params) throws ClientException {
         assertLoggedIn();
         if (params.length == 2) {
             String paramsRecombined = params[0] + " " + params[1];
@@ -163,34 +163,49 @@ public class Client {
                 GameData game = gamesMap.get(gameNumber);
                 if (game != null) {
                     try {
+                        JoinGameRequest request = new JoinGameRequest(null, game.gameID());
+                        DrawBoard artist = new DrawBoard(new ChessGame());
                         if (team == "WHITE") {
-                            game = game.setWhitePlayer(token.username());
+                            request = request.setPlayerColor(ChessGame.TeamColor.WHITE);
+                            server.joinGame(request, token);
+                            return artist.display(ChessGame.TeamColor.WHITE);
                         }
                         else {
-                            game = game.setBlackPlayer(token.username());
+                            request = request.setPlayerColor(ChessGame.TeamColor.BLACK);
+                            server.joinGame(request, token);
+                            return artist.display(ChessGame.TeamColor.BLACK);
                         }
-                        server.joinGame( , token);
                     }
                     catch (Exception e) {
-
+                        throw new ClientException(String.format("Failed to join game %s", gameNumber));
                     }
                 }
                 else {
                     throw new ClientException(String.format("Game %s does not exist", gameNumber));
                 }
-
             }
             else {
                 throw new ClientException("<game number> should be an integer\nTeam color should be either WHITE or BLACK");
             }
         }
-        else {
-            throw new ClientException("Expected: <game number> <WHITE|BLACK>");
-        }
+        throw new ClientException("Expected: <game number> <WHITE|BLACK>");
     }
 
     public String observeGame(String... params) throws ClientException {
         assertLoggedIn();
+        if (params.length == 1) {
+            if (params[0].matches("\\d")) {
+                Integer gameNumber = Integer.parseInt(params[0]);
+                GameData game = gamesMap.get(gameNumber);
+                if (game != null) {
+                    DrawBoard artist = new DrawBoard(new ChessGame());
+                    return artist.display(ChessGame.TeamColor.WHITE);
+                }
+                throw new ClientException(String.format("Game %s does not exist", gameNumber));
+            }
+            throw new ClientException("<game number> should be an integer");
+        }
+        throw new ClientException("Expected: <game number>");
     }
     
 
