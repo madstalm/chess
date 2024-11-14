@@ -1,5 +1,4 @@
 package ui;
-import ui.*;
 import model.*;
 import chess.*;
 
@@ -234,7 +233,7 @@ public class Client {
         if (loggedIn == false) {
             return """
                     - login <username> <password>
-                    - register <original username> <password> <email>
+                    - register <unique username> <password> <email>
                     - help
                     - quit
                     """;
