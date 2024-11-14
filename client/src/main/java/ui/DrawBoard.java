@@ -1,5 +1,7 @@
 package ui;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 
 import static ui.EscapeSequences.*;
@@ -30,7 +32,8 @@ public class DrawBoard {
     }
 
     public void display(ChessGame.TeamColor pov) {
-        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+        StringWriter stringWriter = new StringWriter();
+        PrintWriter out = new PrintWriter(stringWriter, true);
 
         out.print(ERASE_SCREEN);
 
@@ -55,9 +58,15 @@ public class DrawBoard {
 
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
+
+        // Convert captured output to string
+        String output = stringWriter.toString();
+
+        // Now you can print or use the output string later
+        System.out.print(output);
     }
 
-    private static void drawAlphaHeaders(PrintStream out, boolean flip) {
+    private static void drawAlphaHeaders(PrintWriter out, boolean flip) {
 
         setBlack(out);
 
@@ -73,18 +82,18 @@ public class DrawBoard {
         out.println();
     }
 
-    private static void drawHeader(PrintStream out, String headerText) {
+    private static void drawHeader(PrintWriter out, String headerText) {
         printHeaderText(out, headerText);
     }
 
-    private static void printHeaderText(PrintStream out, String text) {
+    private static void printHeaderText(PrintWriter out, String text) {
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
         out.print(text);
         setBlack(out);
     }
 
-    private static void drawMiddle(PrintStream out, boolean flip) {
+    private static void drawMiddle(PrintWriter out, boolean flip) {
         String[] rows = { " 1 ", " 2 ", " 3 ", " 4 ", " 5 ", " 6 ", " 7 ", " 8 " };
         
         if (flip) {
@@ -105,7 +114,7 @@ public class DrawBoard {
         }
     }
 
-    private static void drawRowOfSquares(PrintStream out, boolean flip, int row) {
+    private static void drawRowOfSquares(PrintWriter out, boolean flip, int row) {
         //true is white squares, this is good for even rows
         boolean[] colors = { true, false, true, false, true, false, true, false };
         if ((!isEven(row) && !flip) || (!isEven(row) && flip)) {
@@ -218,7 +227,7 @@ public class DrawBoard {
         return number % 2 == 0;
     }
 
-    private static void setBlack(PrintStream out) {
+    private static void setBlack(PrintWriter out) {
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_BLACK);
     }
