@@ -36,7 +36,7 @@ public class Client {
                 case "listgames" -> listGames();
                 case "playgame" -> playGame();
                 case "observegame" -> observeGame();
-                case "quit" -> "quit";
+                case "quit" -> quit();
                 default -> help();
             };
         } catch (ClientException e) {
@@ -105,9 +105,9 @@ public class Client {
             try {
                 int gameID = server.createGame(game, token);
                 GameData newGame = new GameData(gameID, game.whiteUsername(), game.blackUsername(),
-                game.gameName(), new ChessGame());
+                game.gameName(), null);
                 ++this.availableGames;
-                gamesMap.put( this.availableGames, );
+                gamesMap.put(this.availableGames, newGame);
                 return params[0] + " added to available games\n";
             }
             catch (Exception e) {
@@ -207,7 +207,18 @@ public class Client {
         }
         throw new ClientException("Expected: <game number>");
     }
-    
+
+    public String quit() throws ClientException {
+        try {
+            if (loggedIn == true) {
+                logout();
+            }
+            return "quit";
+        }
+        catch (Exception e) {
+            throw new ClientException(e.getMessage());
+        }
+    }
 
     public String help() {
         if (loggedIn == false) {

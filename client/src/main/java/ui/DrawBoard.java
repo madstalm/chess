@@ -31,7 +31,7 @@ public class DrawBoard {
         board = game.getBoard();
     }
 
-    public void display(ChessGame.TeamColor pov) {
+    public String display(ChessGame.TeamColor pov) {
         StringWriter stringWriter = new StringWriter();
         PrintWriter out = new PrintWriter(stringWriter, true);
 
@@ -63,7 +63,7 @@ public class DrawBoard {
         String output = stringWriter.toString();
 
         // Now you can print or use the output string later
-        System.out.print(output);
+        return output;
     }
 
     private static void drawAlphaHeaders(PrintWriter out, boolean flip) {
