@@ -56,8 +56,8 @@ public class DrawBoard {
                 break;
         }
 
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_WHITE);
+        out.print(RESET_BG_COLOR);
+        out.print(RESET_TEXT_COLOR);
 
         // Convert captured output to string
         String output = stringWriter.toString();
