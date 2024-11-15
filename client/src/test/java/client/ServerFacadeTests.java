@@ -7,7 +7,6 @@ import java.net.*;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.DisplayName;
@@ -16,6 +15,7 @@ import org.junit.jupiter.api.Test;
 import server.Server;
 import ui.ServerFacade;
 import model.*;
+import chess.*;
 
 
 public class ServerFacadeTests {
@@ -160,13 +160,24 @@ public class ServerFacadeTests {
     @Test
     @DisplayName("joinGame")
     public void joinGameTest() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        AuthData auth = facade.register(newUser);
+        GameData newGame = new GameData(null, null, null, "newGame", null);
+        int gameID = facade.createGame(newGame, auth);
+        JoinGameRequest request = new JoinGameRequest(ChessGame.TeamColor.WHITE, gameID);
+        Assertions.assertDoesNotThrow(() -> facade.joinGame(request, auth));
     }
 
     @Test
     @DisplayName("joinGame negative")
     public void joingGameTestNegative() throws Exception {
-        Assertions.assertTrue(true);
+        UserData newUser = new UserData("a", "b", "c@d.com");
+        AuthData auth = facade.register(newUser);
+        GameData newGame = new GameData(null, null, null, "newGame", null);
+        int gameID = facade.createGame(newGame, auth);
+        JoinGameRequest request = new JoinGameRequest(null, gameID);
+        Assertions.assertThrows(Exception.class,
+                () -> facade.joinGame(request, auth));
     }
 
 }
