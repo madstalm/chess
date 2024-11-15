@@ -32,12 +32,6 @@ public class UserService {
         if (dataAccess.getUserData(username) != null) {
             throw new AlreadyTakenException("Error: already taken");
         }
-        // uncomment to reactivate email validation functionality
-        /*
-        if (invalidEmail(user.email())) {
-            throw new InvalidInputException("Error: invalid email");
-        }
-        */
         String hash = BCrypt.hashpw(user.password(), BCrypt.gensalt());
         dataAccess.addUserData(new UserData(user.username(), hash, user.email()));
         return user;
@@ -62,15 +56,6 @@ public class UserService {
 
     public void clear() throws DataAccessException {
         dataAccess.deleteAllUsers();
-    }
-
-    private boolean invalidEmail(String email) {
-        String emailREGEX = "^[a-zA-Z0-9_%+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z]{2,}$";
-        Pattern pattern = Pattern.compile(emailREGEX);
-        if (email == null || email.isEmpty()) {
-            return true;
-        }
-        return !pattern.matcher(email).matches();
     }
     
 }

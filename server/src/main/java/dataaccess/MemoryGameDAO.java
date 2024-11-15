@@ -38,10 +38,6 @@ public class MemoryGameDAO implements GameDAO {
         games.put(game.gameID(), game);
     }
 
-    public void deleteGame(int gameId) {
-        games.remove(gameId);
-    }
-
     public void deleteAllGames() {
         games.clear();
         nextId = 0; //resets the game IDs to 1

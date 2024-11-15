@@ -31,20 +31,20 @@ public class ServerFacade {
 
     public GameData[] listGames(AuthData token) throws ClientException {
         var path = "/game";
-        record listGamesResponse(GameData[] games) {
+        record ListGamesResponse(GameData[] games) {
         }
-        var response = this.makeRequest("GET", path, token, null, listGamesResponse.class);
+        var response = this.makeRequest("GET", path, token, null, ListGamesResponse.class);
         return response.games();
     }
 
     public int createGame(GameData game, AuthData token) throws ClientException {
         var path = "/game";
-        record createGameResponse(int gameID) {
+        record CreateGameResponse(int gameID) {
         }
         if ((game.gameName() == null) || (game.gameName() == "")) {
             throw new ClientException("no gameName specified");
         }
-        var response = this.makeRequest("POST", path, token, game, createGameResponse.class);
+        var response = this.makeRequest("POST", path, token, game, CreateGameResponse.class);
         return response.gameID();
     }
 

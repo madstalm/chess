@@ -160,37 +160,33 @@ public class Client {
         }
     }
 
-    public String playGame(String... params) throws ClientException {//still always joins black. I need to make sure that the http request isn't funky or something
+    public String playGame(String... params) throws ClientException {
         assertLoggedIn();
         if (params.length == 2) {
             String paramsRecombined = params[0] + " " + params[1];
-            if (paramsRecombined.matches("\\d+\\s+(?i)(white|black)")) {
+            if (paramsRecombined.matches("\\d+\\s+(?i)(white|black)") &&
+                        (gamesMap.get(Integer.parseInt(params[0])) != null)) {
                 Integer gameNumber = Integer.parseInt(params[0]);
                 GameData game = gamesMap.get(gameNumber);
-                if (game != null) {
-                    try {
-                        JoinGameRequest request = new JoinGameRequest(null, game.gameID());
-                        DrawBoard artist = new DrawBoard(new ChessGame());
-                        if (params[1].matches("(?i)\\s*white\\s*")) {
-                            request = request.setPlayerColor(ChessGame.TeamColor.WHITE);
-                            server.joinGame(request, token);
-                            return artist.display(ChessGame.TeamColor.WHITE);
-                        }
-                        else  if (params[1].matches("(?i)\\s*black\\s*")){
-                            request = request.setPlayerColor(ChessGame.TeamColor.BLACK);
-                            server.joinGame(request, token);
-                            return artist.display(ChessGame.TeamColor.BLACK);
-                        }
-                        else {
-                            throw new ClientException("Unable to recognize team color");
-                        }
+                try {
+                    JoinGameRequest request = new JoinGameRequest(null, game.gameID());
+                    DrawBoard artist = new DrawBoard(new ChessGame());
+                    if (params[1].matches("(?i)\\s*white\\s*")) {
+                        request = request.setPlayerColor(ChessGame.TeamColor.WHITE);
+                        server.joinGame(request, token);
+                        return artist.display(ChessGame.TeamColor.WHITE);
                     }
-                    catch (Exception e) {
-                        throw new ClientException(String.format("Failed to join game %s", gameNumber));
+                    else  if (params[1].matches("(?i)\\s*black\\s*")){
+                        request = request.setPlayerColor(ChessGame.TeamColor.BLACK);
+                        server.joinGame(request, token);
+                        return artist.display(ChessGame.TeamColor.BLACK);
+                    }
+                    else {
+                        throw new ClientException("Unable to recognize team color");
                     }
                 }
-                else {
-                    throw new ClientException(String.format("Game %s does not exist", gameNumber));
+                catch (Exception e) {
+                    throw new ClientException(String.format("Failed to join game %s", gameNumber));
                 }
             }
             else {

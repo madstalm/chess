@@ -68,11 +68,6 @@ public class SQLGameDAO implements GameDAO {
         DatabaseManager.executeUpdate(statement, new Gson().toJson(game), game.gameID());
     }
 
-    public void deleteGame(int gameId) throws DataAccessException {
-        var statement = "DELETE FROM gameDB WHERE gameId=?";
-        DatabaseManager.executeUpdate(statement, gameId);
-    }
-
     public void deleteAllGames() throws DataAccessException {
         var statement = "TRUNCATE gameDB";
         DatabaseManager.executeUpdate(statement);

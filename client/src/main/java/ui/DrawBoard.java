@@ -124,102 +124,64 @@ public class DrawBoard {
         }
         if (flip) {
             for (int boardCol = BOARD_SIZE_IN_SQUARES; boardCol >= 1; --boardCol) {
-                if (colors[boardCol-1]) {
-                    out.print(SET_BG_COLOR_LIGHT_GREY);
-                }
-                else {
-                    out.print(SET_BG_COLOR_LIGHT_BLUE);
-                }
-                ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
-                if (currentPiece == null) {
-                    out.print(EMPTY);
-                }
-                else {
-                    ChessPiece.PieceType type = currentPiece.getPieceType();
-                    ChessGame.TeamColor team = currentPiece.getTeamColor();
-                    switch (team) {
-                        case WHITE:
-                            out.print(RESET_TEXT_COLOR);
-                            out.print(SET_TEXT_COLOR_WHITE);
-                            break;
-                        case BLACK:
-                            out.print(RESET_TEXT_COLOR);
-                            out.print(SET_TEXT_COLOR_BLACK);
-                            break;
-                    }
-                    switch (type) {
-                        case KING:
-                            out.print(K);
-                            break;
-                        case QUEEN:
-                            out.print(Q);
-                            break;
-                        case BISHOP:
-                            out.print(B);
-                            break;
-                        case KNIGHT:
-                            out.print(N);
-                            break;
-                        case ROOK:
-                            out.print(R);
-                            break;
-                        case PAWN:
-                            out.print(P);
-                            break;
-                    }
-                }
+                drawSquare(out, boardCol, colors, row);
             }
         }
         else {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                if (colors[boardCol-1]) {
-                    out.print(SET_BG_COLOR_LIGHT_GREY);
-                }
-                else {
-                    out.print(SET_BG_COLOR_LIGHT_BLUE);
-                }
-                ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
-                if (currentPiece == null) {
-                    out.print(EMPTY);
-                }
-                else {
-                    ChessPiece.PieceType type = currentPiece.getPieceType();
-                    ChessGame.TeamColor team = currentPiece.getTeamColor();
-                    switch (team) {
-                        case WHITE:
-                            out.print(RESET_TEXT_COLOR);
-                            out.print(SET_TEXT_COLOR_WHITE);
-                            break;
-                        case BLACK:
-                            out.print(RESET_TEXT_COLOR);
-                            out.print(SET_TEXT_COLOR_BLACK);
-                            break;
-                    }
-                    switch (type) {
-                        case KING:
-                            out.print(K);
-                            break;
-                        case QUEEN:
-                            out.print(Q);
-                            break;
-                        case BISHOP:
-                            out.print(B);
-                            break;
-                        case KNIGHT:
-                            out.print(N);
-                            break;
-                        case ROOK:
-                            out.print(R);
-                            break;
-                        case PAWN:
-                            out.print(P);
-                            break;
-                    }
-                } 
+                drawSquare(out, boardCol, colors, row);
             }
         }
         setBlack(out);
     }
+
+    private static void drawSquare(PrintWriter out, int boardCol, boolean[] colors, int row) {
+        if (colors[boardCol-1]) {
+            out.print(SET_BG_COLOR_LIGHT_GREY);
+        }
+        else {
+            out.print(SET_BG_COLOR_LIGHT_BLUE);
+        }
+        ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
+        if (currentPiece == null) {
+            out.print(EMPTY);
+        }
+        else {
+            ChessPiece.PieceType type = currentPiece.getPieceType();
+            ChessGame.TeamColor team = currentPiece.getTeamColor();
+            switch (team) {
+                case WHITE:
+                    out.print(RESET_TEXT_COLOR);
+                    out.print(SET_TEXT_COLOR_WHITE);
+                    break;
+                case BLACK:
+                    out.print(RESET_TEXT_COLOR);
+                    out.print(SET_TEXT_COLOR_BLACK);
+                    break;
+            }
+            switch (type) {
+                case KING:
+                    out.print(K);
+                    break;
+                case QUEEN:
+                    out.print(Q);
+                    break;
+                case BISHOP:
+                    out.print(B);
+                    break;
+                case KNIGHT:
+                    out.print(N);
+                    break;
+                case ROOK:
+                    out.print(R);
+                    break;
+                case PAWN:
+                    out.print(P);
+                    break;
+            }
+        }
+    }
+        
 
     private static boolean isEven(int number) {
         return number % 2 == 0;
