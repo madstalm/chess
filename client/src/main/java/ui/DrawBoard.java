@@ -125,10 +125,10 @@ public class DrawBoard {
         if (flip) {
             for (int boardCol = BOARD_SIZE_IN_SQUARES; boardCol >= 1; --boardCol) {
                 if (colors[boardCol-1]) {
-                    out.print(SET_BG_COLOR_YELLOW);
+                    out.print(SET_BG_COLOR_LIGHT_GREY);
                 }
                 else {
-                    out.print(SET_BG_COLOR_BLUE);
+                    out.print(SET_BG_COLOR_LIGHT_BLUE);
                 }
                 ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
                 if (currentPiece == null) {
@@ -140,8 +140,7 @@ public class DrawBoard {
                     switch (team) {
                         case WHITE:
                             out.print(RESET_TEXT_COLOR);
-                            out.print(SET_TEXT_BOLD);
-                            out.print(SET_TEXT_COLOR_BRIGHT_WHITE);
+                            out.print(SET_TEXT_COLOR_WHITE);
                             break;
                         case BLACK:
                             out.print(RESET_TEXT_COLOR);
@@ -169,16 +168,15 @@ public class DrawBoard {
                             break;
                     }
                 }
-                out.print(RESET_TEXT_BOLD_FAINT);
             }
         }
         else {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
                 if (colors[boardCol-1]) {
-                    out.print(SET_BG_COLOR_YELLOW);
+                    out.print(SET_BG_COLOR_LIGHT_GREY);
                 }
                 else {
-                    out.print(SET_BG_COLOR_BLUE);
+                    out.print(SET_BG_COLOR_LIGHT_BLUE);
                 }
                 ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
                 if (currentPiece == null) {
@@ -190,8 +188,7 @@ public class DrawBoard {
                     switch (team) {
                         case WHITE:
                             out.print(RESET_TEXT_COLOR);
-                            out.print(SET_TEXT_BOLD);
-                            out.print(SET_TEXT_COLOR_BRIGHT_WHITE);
+                            out.print(SET_TEXT_COLOR_WHITE);
                             break;
                         case BLACK:
                             out.print(RESET_TEXT_COLOR);
@@ -218,8 +215,7 @@ public class DrawBoard {
                             out.print(P);
                             break;
                     }
-                }
-                out.print(RESET_TEXT_BOLD_FAINT); 
+                } 
             }
         }
         setBlack(out);
