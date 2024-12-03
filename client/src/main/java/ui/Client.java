@@ -13,6 +13,8 @@ public class Client {
     private final ServerFacade server;
     private final String serverUrl;
     private boolean loggedIn = false;
+    private boolean playingGame = false;
+    private boolean observingGame = false;
     /**
      * stores localID as key, GameData as value.
      * GameData does not store a ChessGame instance.
@@ -47,6 +49,11 @@ public class Client {
                 case "listgames" -> listGames();
                 case "playgame" -> playGame(params);
                 case "observegame" -> observeGame(params);
+                case "redrawboard" -> redrawBoard();
+                case "leave" -> leave();
+                case "makemove" -> makeMove(params);
+                case "resign" -> resign();
+                case "legalmoves" -> legalMoves(params);
                 case "quit" -> quit();
                 default -> help();
             };
@@ -171,6 +178,7 @@ public class Client {
                 try {
                     JoinGameRequest request = new JoinGameRequest(null, game.gameID());
                     DrawBoard artist = new DrawBoard(new ChessGame());
+                    playingGame = true;
                     if (params[1].matches("(?i)\\s*white\\s*")) {
                         request = request.setPlayerColor(ChessGame.TeamColor.WHITE);
                         server.joinGame(request, token);
@@ -203,6 +211,7 @@ public class Client {
                 Integer gameNumber = Integer.parseInt(params[0]);
                 GameData game = gamesMap.get(gameNumber);
                 if (game != null) {
+                    observingGame = true;
                     DrawBoard artist = new DrawBoard(new ChessGame());
                     return artist.display(ChessGame.TeamColor.WHITE);
                 }
@@ -217,12 +226,57 @@ public class Client {
         try {
             if (loggedIn == true) {
                 logout();
+                playingGame = false;
+                observingGame = false;
             }
             return "quit";
         }
         catch (Exception e) {
             throw new ClientException(e.getMessage());
         }
+    }
+
+    //redrawBoard - legalMoves will call methods in the WebsocketHandler class, which will do most of the implementation
+    //they exist in client so that they can have access to variables like loggedIn, playingGame, etc.
+
+    public String redrawBoard() throws ClientException {
+        assertLoggedIn();
+        if ((playingGame == false)&&(observingGame == false)) {
+            return help();
+        }
+        return "Error: not implemented";
+    }
+
+    public String leave() throws ClientException {
+        assertLoggedIn();
+        if ((playingGame == false)&&(observingGame == false)) {
+            return help();
+        }
+        return "Error: not implemented";
+    }
+
+    public String makeMove(String... params) throws ClientException {
+        assertLoggedIn();
+        if (playingGame == false) {
+            return help();
+        }
+        return "Error: not implemented";
+    }
+
+    public String resign() throws ClientException {
+        assertLoggedIn();
+        if (playingGame == false) {
+            return help();
+        }
+        return "Error: not implemented";
+    }
+
+    public String legalMoves(String... params) throws ClientException {
+        assertLoggedIn();
+        if ((playingGame == false)&&(observingGame == false)) {
+            return help();
+        }
+        return "Error: not implemented";
     }
 
     public String help() {
@@ -233,6 +287,24 @@ public class Client {
                     - help
                     - quit
                     """;
+        }
+        else if ((loggedIn == true)&&(playingGame == true)) {
+            return """
+                - help
+                - redrawBoard
+                - Leave
+                - makeMove <origin:(a-h)(1-8)><destination:(a-h)(1-8)> [ex. "makeMove d1a4"]
+                - resign
+                - legalMoves <(a-h)(1-8)>
+            """;
+        }
+        else if ((loggedIn == true)&&(observingGame == true)) {
+            return """
+                - help
+                - redrawBoard
+                - Leave
+                - legalMoves <(a-h)(1-8)> [ex. "legalMoves d1"]
+            """;
         }
         return """
                     - help
