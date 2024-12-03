@@ -12,6 +12,9 @@ import dataaccess.DataAccessException;
 import dataaccess.InvalidInputException;
 import dataaccess.UnauthorizedException;
 import model.*;
+import websocket.commands.*;
+import websocket.messages.*;
+import server.serverwebsocket.*;
 import service.AuthService;
 import service.GameService;
 import service.UserService;
@@ -20,6 +23,7 @@ public class Server {
     private final AuthService authService;
     private final GameService gameService;
     private final UserService userService;
+    private final WebSocketHandler webSocketHandler;
     
     public Server(boolean startWithSQL) {
         dataaccess.AuthDAO authDAO = new dataaccess.MemoryAuthDAO();
@@ -39,6 +43,7 @@ public class Server {
         this.authService = new AuthService(authDAO);
         this.gameService = new GameService(gameDAO);
         this.userService = new UserService(userDAO);
+        webSocketHandler = new WebSocketHandler();
     }
     
     public Server() {
@@ -57,13 +62,15 @@ public class Server {
         this.authService = new AuthService(authDAO);
         this.gameService = new GameService(gameDAO);
         this.userService = new UserService(userDAO);
+        webSocketHandler = new WebSocketHandler();
     }
 
     public int run(int desiredPort) {
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");
-        //Initialize Websocket stuff before initializing endpoints! .init() is implicit with first endpoint initialization
+
+        Spark.webSocket("/ws", webSocketHandler);
         
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
