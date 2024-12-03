@@ -182,12 +182,12 @@ public class Client {
                     if (params[1].matches("(?i)\\s*white\\s*")) {
                         request = request.setPlayerColor(ChessGame.TeamColor.WHITE);
                         server.joinGame(request, token);
-                        return artist.display(ChessGame.TeamColor.WHITE);
+                        return artist.display(ChessGame.TeamColor.WHITE) + "\n\n" + help();
                     }
                     else  if (params[1].matches("(?i)\\s*black\\s*")){
                         request = request.setPlayerColor(ChessGame.TeamColor.BLACK);
                         server.joinGame(request, token);
-                        return artist.display(ChessGame.TeamColor.BLACK);
+                        return artist.display(ChessGame.TeamColor.BLACK) + "\n\n" + help();
                     }
                     else {
                         throw new ClientException("Unable to recognize team color");
@@ -212,8 +212,9 @@ public class Client {
                 GameData game = gamesMap.get(gameNumber);
                 if (game != null) {
                     observingGame = true;
+                    
                     DrawBoard artist = new DrawBoard(new ChessGame());
-                    return artist.display(ChessGame.TeamColor.WHITE);
+                    return artist.display(ChessGame.TeamColor.WHITE) + "\n\n" + help();
                 }
                 throw new ClientException(String.format("Game %s does not exist", gameNumber));
             }
@@ -236,9 +237,10 @@ public class Client {
         }
     }
 
-    //redrawBoard - legalMoves will call methods in the WebsocketHandler class, which will do most of the implementation
+    //redrawBoard - legalMoves could be called in some kind of WebsocketHandler class, which will do most of the implementation
     //they exist in client so that they can have access to variables like loggedIn, playingGame, etc.
 
+    //could be called as the final step in playGame() and observeGame()
     public String redrawBoard() throws ClientException {
         assertLoggedIn();
         if ((playingGame == false)&&(observingGame == false)) {
@@ -252,6 +254,9 @@ public class Client {
         if ((playingGame == false)&&(observingGame == false)) {
             return help();
         }
+
+        playingGame = false;
+        observingGame = false;
         return "Error: not implemented";
     }
 
@@ -268,9 +273,11 @@ public class Client {
         if (playingGame == false) {
             return help();
         }
+
         return "Error: not implemented";
     }
 
+    //could be nearly the same as redrawBoard(), but with some kind of array passed in
     public String legalMoves(String... params) throws ClientException {
         assertLoggedIn();
         if ((playingGame == false)&&(observingGame == false)) {
