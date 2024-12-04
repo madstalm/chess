@@ -1,6 +1,9 @@
 package server.serverwebsocket;
 
 import org.eclipse.jetty.websocket.api.Session;
+
+import com.google.gson.Gson;
+
 import websocket.messages.*;
 
 import java.io.IOException;
@@ -19,12 +22,13 @@ public class ConnectionManager {
         connections.remove(username);
     }
 
+    //might need some kind of broadcast method for game updates that really does blast everyone, not just the excluded user
     public void broadcast(String excludeUsername, Integer currentGameID, ServerMessage message) throws IOException {
         var removeList = new ArrayList<Connection>();
         for (var c : connections.values()) {
             if (c.session.isOpen()) {
                 if ((!c.username.equals(excludeUsername))&&(c.gameID.equals(currentGameID))) {
-                    c.send(message.toString());
+                    c.send(new Gson().toJson(message));
                 }
             } else {
                 removeList.add(c);

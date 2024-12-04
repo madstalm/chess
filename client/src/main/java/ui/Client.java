@@ -63,6 +63,9 @@ public class Client {
     }
 
     public String login(String... params) throws ClientException {
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         if (loggedIn) {
             return "Already logged in\n";
         }
@@ -83,6 +86,9 @@ public class Client {
     }
 
     public String register(String... params) throws ClientException {
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         if (loggedIn) {
             return "Already logged in\n";
         }
@@ -105,6 +111,9 @@ public class Client {
 
     public String logout() throws ClientException {
         assertLoggedIn();
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         try {
             server.logout(token);
             token = null;
@@ -118,6 +127,9 @@ public class Client {
 
     public String createGame(String... params) throws ClientException {
         assertLoggedIn();
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         if (params.length == 1) {
             GameData game = new GameData(null, null, null, params[0], null);
             if (!gamesNames.containsValue(game.gameName())) {
@@ -142,6 +154,9 @@ public class Client {
 
     public String listGames() throws ClientException {
         assertLoggedIn();
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         try {
             GameData[] games = server.listGames(token);
             var result = new StringBuilder();
@@ -169,6 +184,9 @@ public class Client {
 
     public String playGame(String... params) throws ClientException {
         assertLoggedIn();
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         if (params.length == 2) {
             String paramsRecombined = params[0] + " " + params[1];
             if (paramsRecombined.matches("\\d+\\s+(?i)(white|black)") &&
@@ -206,6 +224,9 @@ public class Client {
 
     public String observeGame(String... params) throws ClientException {
         assertLoggedIn();
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         if (params.length == 1) {
             if (params[0].matches("\\d+")) {
                 Integer gameNumber = Integer.parseInt(params[0]);
@@ -224,6 +245,9 @@ public class Client {
     }
 
     public String quit() throws ClientException {
+        if ((playingGame)||(observingGame)) {
+            return help();
+        }
         try {
             if (loggedIn == true) {
                 logout();
@@ -297,21 +321,21 @@ public class Client {
         }
         else if ((loggedIn == true)&&(playingGame == true)) {
             return """
-                - help
-                - redrawBoard
-                - Leave
-                - makeMove <origin:(a-h)(1-8)><destination:(a-h)(1-8)> [ex. "makeMove d1a4"]
-                - resign
-                - legalMoves <(a-h)(1-8)>
-            """;
+                    - help
+                    - redrawBoard
+                    - Leave
+                    - makeMove <origin:(a-h)(1-8)><destination:(a-h)(1-8)> [ex. "makeMove d1a4"]
+                    - resign
+                    - legalMoves <(a-h)(1-8)>
+                    """;
         }
         else if ((loggedIn == true)&&(observingGame == true)) {
             return """
-                - help
-                - redrawBoard
-                - Leave
-                - legalMoves <(a-h)(1-8)> [ex. "legalMoves d1"]
-            """;
+                    - help
+                    - redrawBoard
+                    - Leave
+                    - legalMoves <(a-h)(1-8)> [ex. "legalMoves d1"]
+                    """;
         }
         return """
                     - help
