@@ -67,6 +67,9 @@ public class ChessGame {
         }
     }
 
+    /**
+     * sets gameOver to true; ideally would be called by the server/client to end gameplay
+     */
     public void finishGame() {
         gameOver = true;
     }
@@ -97,7 +100,6 @@ public class ChessGame {
                 ChessBoard copyBoard = new ChessBoard(game);
                 setBoard(copyBoard);
                 tryMove(move);
-                //System.out.println(game);
                 if (!isInCheck(currentPiece.getTeamColor())) {
                     validMoves.add(move);
                 }
@@ -119,7 +121,7 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (gameOver) {
-            throw new InvalidMoveException("Error: the game is over");
+            throw new InvalidMoveException("The game is over");
         }
         ChessPiece myPiece = game.getPiece(move.getStartPosition());
         if (myPiece != null) {
@@ -136,7 +138,7 @@ public class ChessGame {
                     game.removePiece(move.getStartPosition());
                     changeTurn(myPiece.getTeamColor());
                 }
-                else { throw new InvalidMoveException("King put in danger"); }
+                else { throw new InvalidMoveException("Invalid move (king put in danger or end position occupied)"); }
             }
             else { throw new InvalidMoveException("Attempted move when not on turn"); }
         }
