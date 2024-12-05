@@ -81,6 +81,10 @@ public class WebSocketHandler {
     private void leave(UserGameCommand command, Session session) throws Exception {
         try {
             AuthData authData = authService.checkAuth(command.getAuthToken());
+            connections.remove(authData.authToken());
+            var message = String.format("%s left the game", authData.username());
+            var notification = new NotificationMessage(ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(authData.authToken(), command.getGameID(), notification);
         }
         catch (UnauthorizedException e) {
             var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: unauthorized"));
