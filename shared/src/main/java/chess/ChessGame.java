@@ -79,7 +79,12 @@ public class ChessGame {
      */
     public enum TeamColor {
         WHITE,
-        BLACK
+        BLACK;
+
+        @Override
+        public String toString() {
+            return name().toLowerCase();
+        }
     }
 
     /**
@@ -116,8 +121,8 @@ public class ChessGame {
      *
      * @param move chess move to preform
      * @throws InvalidMoveException if move is invalid
-     * A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger,
-     *  or if it’s not the corresponding team's turn.
+     *  - A move is illegal if the chess piece cannot move there, if the move leaves the team’s king in danger,
+     * if the game is over, or if it’s not the corresponding team's turn.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         if (gameOver) {

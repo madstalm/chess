@@ -2,7 +2,7 @@ package server.serverwebsocket;
 
 import com.google.gson.Gson;
 
-import dataaccess.UnauthorizedException;
+import dataaccess.*;
 import service.*;
 import model.*;
 import chess.*;
@@ -71,13 +71,53 @@ public class WebSocketHandler {
         MakeMoveCommand command = new Gson().fromJson(message, MakeMoveCommand.class);
         try {
             AuthData authData = authService.checkAuth(command.getAuthToken());
+            PlayerData player = getPlayer(authData.username(), command.getGameID());
+            if (player.opponent() == null) {
+                throw new InvalidMoveException(String.format("there is no % player", player.opponentColor().toString()));
+            }
+            ChessGame game =  gameService.getGame(command.getGameID());
+            game.makeMove(command.getMove());
+            LoadGameMessage updatedGame = new LoadGameMessage(ServerMessageType.LOAD_GAME, game);
+            connections.broadcastUser(authData.authToken(), updatedGame);
+            connections.broadcast(authData.authToken(), command.getGameID(), updatedGame);
+            //handler updates to game state
+            if (game.isInCheckmate(player.opponentColor())) {
+                NotificationMessage checkmateMessage = new NotificationMessage(ServerMessageType.NOTIFICATION,
+                        String.format("congratulations %s player %s, %s player %s is in check",
+                        player.playerColor().toString(), player.username(), player.opponentColor().toString(), player.opponent()));
+                connections.broadcastUser(authData.authToken(), checkmateMessage);
+                connections.broadcast(authData.authToken(), command.getGameID(), checkmateMessage);
+            }
+            else if (game.isInCheck(player.opponentColor())) {
+                NotificationMessage checkMessage = new NotificationMessage(ServerMessageType.NOTIFICATION,
+                        String.format("%s player %s is in check", player.opponentColor().toString(), player.opponent()));
+                connections.broadcastUser(authData.authToken(), checkMessage);
+                connections.broadcast(authData.authToken(), command.getGameID(), checkMessage);
+            }
+            else if (game.isInStalemate(player.opponentColor())) {
+                NotificationMessage staleMessage = new NotificationMessage(ServerMessageType.NOTIFICATION,
+                        "the game has ended in a stalemate");
+                connections.broadcastUser(authData.authToken(), staleMessage);
+                connections.broadcast(authData.authToken(), command.getGameID(), staleMessage);
+            }
+            //updates the game in the db
+            gameService.updateGameData(command.getGameID(), game);
         }
         catch (UnauthorizedException e) {
             var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: unauthorized"));
             session.getRemote().sendString(msg);
         }
+        catch (InvalidMoveException e) {
+            var errorMessage = new ErrorMessage(ServerMessageType.ERROR, "Error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(errorMessage));
+        }
+        catch (DataAccessException e) {
+            var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: server unable to access game"));
+            session.getRemote().sendString(msg);
+        }
     }
 
+    //need to check if when I leave a game if I am just leaving the game or leaving the session altogether
     private void leave(UserGameCommand command, Session session) throws Exception {
         try {
             AuthData authData = authService.checkAuth(command.getAuthToken());
@@ -110,6 +150,19 @@ public class WebSocketHandler {
         catch (Exception e) {
             return new ErrorMessage(ServerMessageType.ERROR, "Error: server unable to access game");
         }
+    }
+
+    private PlayerData getPlayer(String username, Integer gameID) throws DataAccessException {
+        GameData game = gameService.getGameData(gameID);
+        String opponent = game.blackUsername();
+        ChessGame.TeamColor playerColor = ChessGame.TeamColor.WHITE;
+        ChessGame.TeamColor opponentColor = ChessGame.TeamColor.BLACK;
+        if (username == game.blackUsername()) {
+            opponent = game.whiteUsername();
+            playerColor = ChessGame.TeamColor.BLACK;
+            opponentColor = ChessGame.TeamColor.WHITE;
+        }
+        return new PlayerData(username, gameID, playerColor, opponent, opponentColor);
     }
 
 }

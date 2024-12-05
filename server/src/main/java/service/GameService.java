@@ -38,6 +38,15 @@ public class GameService {
         return game.game();
     }
 
+    /**
+     * @param gameID
+     * @return the GameData object for the given gameID
+     * @throws DataAccessException
+     */
+    public GameData getGameData(Integer gameID) throws DataAccessException {
+        return dataAccess.getGameData(gameID);
+    }
+
     public Integer gameCreator(GameData game) throws DataAccessException {
         game = dataAccess.addGame(game);
         return game.gameID();
@@ -70,8 +79,16 @@ public class GameService {
         dataAccess.updateGameData(updatedGame);
     }
 
+    public void updateGameData(Integer gameID, ChessGame game) throws DataAccessException {
+        GameData updatedGame = getGameData(gameID);
+        updatedGame = updatedGame.setGame(game);
+        dataAccess.updateGameData(updatedGame);
+    }
+
     public void clear() throws DataAccessException {
         dataAccess.deleteAllGames();
     }
+
+    
     
 }

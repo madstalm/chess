@@ -22,4 +22,8 @@ public record GameData(Integer gameID, String whiteUsername, String blackUsernam
         return new GameData(id, this.whiteUsername, this.blackUsername, this.gameName, this.game);
     }
 
+    public GameData setGame(ChessGame newGame) {
+        return new GameData(this.gameID, this.whiteUsername, this.blackUsername, this.gameName, newGame);
+    }
+
 }
