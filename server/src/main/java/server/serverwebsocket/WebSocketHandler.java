@@ -11,8 +11,6 @@ import org.eclipse.jetty.websocket.api.annotations.*;
 
 import java.io.IOException;
 
-import javax.management.Notification;
-
 import org.eclipse.jetty.websocket.api.*;
 
 import websocket.commands.*;
@@ -24,12 +22,10 @@ public class WebSocketHandler {
     private final ConnectionManager connections;
     private final AuthService authService;
     private final GameService gameService;
-    private final UserService userService;
 
-    public WebSocketHandler(AuthService authService, GameService gameService, UserService userService) {
+    public WebSocketHandler(AuthService authService, GameService gameService) {
         this.authService = authService;
         this.gameService = gameService;
-        this.userService = userService;
         connections = new ConnectionManager();
     }
 
@@ -76,10 +72,17 @@ public class WebSocketHandler {
                 throw new InvalidMoveException(String.format("there is no % player", player.opponentColor().toString()));
             }
             ChessGame game =  gameService.getGame(command.getGameID());
+            //make the move
             game.makeMove(command.getMove());
             LoadGameMessage updatedGame = new LoadGameMessage(ServerMessageType.LOAD_GAME, game);
+            //send out the updated game to clients
             connections.broadcastUser(authData.authToken(), updatedGame);
             connections.broadcast(authData.authToken(), command.getGameID(), updatedGame);
+            //broadcast moves to opponents and observers
+            String moveMessage = String.format("%s player % made move %s", player.playerColor().toString(),
+                    player.username(), command.getMove().toString());
+            NotificationMessage moveBroadcast = new NotificationMessage(ServerMessageType.NOTIFICATION, moveMessage);
+            connections.broadcast(authData.authToken(), command.getGameID(), moveBroadcast);
             //handler updates to game state
             if (game.isInCheckmate(player.opponentColor())) {
                 NotificationMessage checkmateMessage = new NotificationMessage(ServerMessageType.NOTIFICATION,
@@ -100,8 +103,8 @@ public class WebSocketHandler {
                 connections.broadcastUser(authData.authToken(), staleMessage);
                 connections.broadcast(authData.authToken(), command.getGameID(), staleMessage);
             }
-            //updates the game in the db
-            gameService.updateGameData(command.getGameID(), game);
+            //update the game in the db
+            gameService.updateGame(command.getGameID(), game);
         }
         catch (UnauthorizedException e) {
             var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: unauthorized"));
@@ -117,10 +120,23 @@ public class WebSocketHandler {
         }
     }
 
-    //need to check if when I leave a game if I am just leaving the game or leaving the session altogether
     private void leave(UserGameCommand command, Session session) throws Exception {
         try {
             AuthData authData = authService.checkAuth(command.getAuthToken());
+            //remove player from game if not observer
+            PlayerData player = getPlayer(authData.username(), command.getGameID());
+            if (player.username()!=null) {
+                GameData game = gameService.getGameData(command.getGameID());
+                GameData updatedGame = game;
+                switch (player.playerColor()) {
+                    case WHITE:
+                        updatedGame = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game());
+                    case BLACK:
+                        updatedGame = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
+                }
+                gameService.updateGameData(updatedGame);
+            }
+            //remove connection and notify clients
             connections.remove(authData.authToken());
             var message = String.format("%s left the game", authData.username());
             var notification = new NotificationMessage(ServerMessageType.NOTIFICATION, message);
@@ -130,14 +146,33 @@ public class WebSocketHandler {
             var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: unauthorized"));
             session.getRemote().sendString(msg);
         }
+        catch (DataAccessException e) {
+            var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: server unable to access game"));
+            session.getRemote().sendString(msg);
+        }
     }
 
     private void resign(UserGameCommand command, Session session) throws Exception {
         try {
             AuthData authData = authService.checkAuth(command.getAuthToken());
+            PlayerData player = getPlayer(authData.username(), command.getGameID());
+            ChessGame game =  gameService.getGame(command.getGameID());
+            game.finishGame();
+            //update the game in the db
+            gameService.updateGame(command.getGameID(), game);
+            //broadcast result
+            var message = String.format("%s player %s has resigned from the game; %s player %s wins",
+                    player.playerColor().toString(), player.username(), player.opponentColor().toString(), player.opponent());
+            var notification = new NotificationMessage(ServerMessageType.NOTIFICATION, message);
+            connections.broadcast(authData.authToken(), command.getGameID(), notification);
+            connections.broadcastUser(authData.authToken(), notification);
         }
         catch (UnauthorizedException e) {
             var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: unauthorized"));
+            session.getRemote().sendString(msg);
+        }
+        catch (DataAccessException e) {
+            var msg = new Gson().toJson(new ErrorMessage(ServerMessageType.ERROR, "Error: server unable to access game"));
             session.getRemote().sendString(msg);
         }
     }
@@ -154,15 +189,23 @@ public class WebSocketHandler {
 
     private PlayerData getPlayer(String username, Integer gameID) throws DataAccessException {
         GameData game = gameService.getGameData(gameID);
-        String opponent = game.blackUsername();
-        ChessGame.TeamColor playerColor = ChessGame.TeamColor.WHITE;
-        ChessGame.TeamColor opponentColor = ChessGame.TeamColor.BLACK;
-        if (username == game.blackUsername()) {
+        String playerUsername = null;
+        String opponent = null;
+        ChessGame.TeamColor playerColor = null;
+        ChessGame.TeamColor opponentColor = null;
+        if (username == game.whiteUsername()) {
+            playerUsername = username;
+            opponent = game.blackUsername();
+            playerColor = ChessGame.TeamColor.WHITE;
+            opponentColor = ChessGame.TeamColor.BLACK;
+        }
+        else if (username == game.blackUsername()) {
+            playerUsername = username;
             opponent = game.whiteUsername();
             playerColor = ChessGame.TeamColor.BLACK;
             opponentColor = ChessGame.TeamColor.WHITE;
         }
-        return new PlayerData(username, gameID, playerColor, opponent, opponentColor);
+        return new PlayerData(playerUsername, gameID, playerColor, opponent, opponentColor);
     }
 
 }

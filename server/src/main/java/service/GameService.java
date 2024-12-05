@@ -79,10 +79,14 @@ public class GameService {
         dataAccess.updateGameData(updatedGame);
     }
 
-    public void updateGameData(Integer gameID, ChessGame game) throws DataAccessException {
+    public void updateGame(Integer gameID, ChessGame game) throws DataAccessException {
         GameData updatedGame = getGameData(gameID);
         updatedGame = updatedGame.setGame(game);
         dataAccess.updateGameData(updatedGame);
+    }
+
+    public void updateGameData(GameData gameData) throws DataAccessException {
+        dataAccess.updateGameData(gameData);
     }
 
     public void clear() throws DataAccessException {

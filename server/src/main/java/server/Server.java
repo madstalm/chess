@@ -62,7 +62,7 @@ public class Server {
         this.authService = new AuthService(authDAO);
         this.gameService = new GameService(gameDAO);
         this.userService = new UserService(userDAO);
-        webSocketHandler = new WebSocketHandler(this.authService, this.gameService, this.userService);
+        webSocketHandler = new WebSocketHandler(this.authService, this.gameService);
     }
 
     public int run(int desiredPort) {
