@@ -32,16 +32,17 @@ public class WebSocketHandler {
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws Exception {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-        //check authorization for the command with the authtoken
         switch (command.getCommandType()) {
-            case CONNECT -> connect(message, session);
+            case CONNECT -> connect(command, session);
             case MAKE_MOVE -> makeMove(message, session);
             case LEAVE -> leave(command, session);
             case RESIGN -> resign(command, session);
         }
     }
 
-    private void connect(String message, Session session) throws Exception {
+    private void connect(UserGameCommand command, Session session) throws Exception {
+        //I need to validate that the ConnectCommand class is kosher with the tests and stuff
+        /*
         ConnectCommand command = new Gson().fromJson(message, ConnectCommand.class);
         try {
             AuthData authData = authService.checkAuth(command.getAuthToken());
@@ -52,6 +53,22 @@ public class WebSocketHandler {
             }
             else { //a player has joined
                 sendMessage = String.format("%s has joined the game as %s", authData.username(), command.getTeamColorString());
+            }
+            var notification = new NotificationMessage(ServerMessageType.NOTIFICATION, sendMessage);
+            connections.broadcastUser(authData.authToken(), findLoadGame(command.getGameID()));
+            connections.broadcast(authData.authToken(), command.getGameID(), notification);
+        }
+        */
+        try {
+            AuthData authData = authService.checkAuth(command.getAuthToken());
+            connections.add(authData.authToken(), command.getGameID(), session);
+            String sendMessage = "";
+            PlayerData player = getPlayer(authData.username(), command.getGameID());
+            if (player.username()!=null) { //a player has joined
+                sendMessage = String.format("%s has joined the game as %s", player.username(), player.playerColor().toString());
+            }
+            else { //an observer has joined
+                sendMessage = String.format("%s has joined the game as observer", authData.username());
             }
             var notification = new NotificationMessage(ServerMessageType.NOTIFICATION, sendMessage);
             connections.broadcastUser(authData.authToken(), findLoadGame(command.getGameID()));
