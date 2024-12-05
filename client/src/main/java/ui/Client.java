@@ -12,9 +12,13 @@ public class Client {
     private AuthData token = null;
     private final ServerFacade server;
     private final String serverUrl;
+    private final ServerMessageHandler serverMessageHandler;
+    private WebSocketFacade ws;
     private boolean loggedIn = false;
     private boolean playingGame = false;
     private boolean observingGame = false;
+    private ChessGame currentGame;
+    private ChessGame.TeamColor currentTeam;
     /**
      * stores localID as key, GameData as value.
      * GameData does not store a ChessGame instance.
@@ -30,10 +34,11 @@ public class Client {
     private Map<Integer, Integer> gamesIDs = new HashMap<>();
     private int availableGames;
 
-    public Client(String serverUrl) {
+    public Client(String serverUrl, ServerMessageHandler serverMessageHandler) {
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.availableGames = 0;
+        this.serverMessageHandler = serverMessageHandler;
     }
 
     public String eval(String input) {
@@ -182,7 +187,7 @@ public class Client {
         }
     }
 
-    public String playGame(String... params) throws ClientException {
+    public void playGame(String... params) throws ClientException {
         assertLoggedIn();
         if ((playingGame)||(observingGame)) {
             return help();
@@ -369,6 +374,15 @@ public class Client {
     private void assertLoggedIn() throws ClientException {
         if (loggedIn == false) {
             throw new ClientException("You must sign in");
+        }
+    }
+
+    public ChessGame.TeamColor getPlayerColor() {
+        if (currentTeam == ChessGame.TeamColor.BLACK) {
+            return currentTeam;
+        }
+        else {
+            return ChessGame.TeamColor.WHITE;
         }
     }
 }

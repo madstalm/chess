@@ -1,14 +1,20 @@
 package ui;
 
 import java.util.Scanner;
+import websocket.messages.*;
+import com.google.gson.Gson;
+
+import chess.ChessGame;
+
+import javax.management.Notification;
 
 import static ui.EscapeSequences.*;
 
-public class UiManager {
+public class UiManager implements ServerMessageHandler {
     private final Client client;
     
     public UiManager(String serverUrl) {
-        client = new Client(serverUrl);
+        client = new Client(serverUrl, this);
     }
 
     public void run() {
@@ -37,5 +43,22 @@ public class UiManager {
 
     private void printPrompt() {
         System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
+    }
+    
+    public void notify(String message) {
+        ServerMessage unprocessed = new Gson().fromJson(message, ServerMessage.class);
+        switch (unprocessed.getServerMessageType()) {
+            case NOTIFICATION:
+                NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
+                System.out.println(SET_TEXT_COLOR_BLUE + notification.getNotification());
+            case ERROR:
+                ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
+                System.out.println(SET_TEXT_COLOR_RED + errorMessage.getErrorMessage());
+            case LOAD_GAME:
+                LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
+                DrawBoard artist = new DrawBoard(loadGame.getChessGame());
+                System.out.print(artist.display(client.getPlayerColor()) + "\n");
+        }
+        printPrompt();
     }
 }

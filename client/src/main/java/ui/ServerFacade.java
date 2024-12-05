@@ -1,7 +1,6 @@
 package ui;
 
 import com.google.gson.Gson;
-import chess.*;
 import model.*;
 
 import java.io.*;

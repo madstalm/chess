@@ -42,6 +42,7 @@ public class WebSocketHandler {
 
     private void connect(UserGameCommand command, Session session) throws Exception {
         //I need to validate that the ConnectCommand class is kosher with the tests and stuff
+        // ***update***, this method no longer uses ConnectCommand. I will need to get rid of the old code and delete the class before I submit
         /*
         ConnectCommand command = new Gson().fromJson(message, ConnectCommand.class);
         try {
