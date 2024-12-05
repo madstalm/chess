@@ -14,6 +14,7 @@ public class ChessGame {
     
     private ChessBoard game = new ChessBoard();
     private TeamColor turn;
+    private boolean gameOver = false;
 
     public ChessGame() {
         game.resetBoard();
@@ -30,7 +31,7 @@ public class ChessGame {
 
     @Override
     public int hashCode() {
-        return Objects.hash(game, turn);
+        return Objects.hash(game, turn, gameOver);
     }
 
     /**
@@ -66,6 +67,10 @@ public class ChessGame {
         }
     }
 
+    public void finishGame() {
+        gameOver = true;
+    }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
@@ -85,7 +90,7 @@ public class ChessGame {
         Collection<ChessMove> potentialMoves = new ArrayList<>();
         Collection<ChessMove> validMoves = new ArrayList<>();
         ChessPiece currentPiece = game.getPiece(startPosition);
-        if (currentPiece != null) { //if no piece at the start position, validMoves returns an empty array (null)
+        if ((currentPiece != null)&&!gameOver) { //if no piece at the start position, validMoves returns an empty array (null)
             potentialMoves.addAll(currentPiece.pieceMoves(game, startPosition));
             ChessBoard ogBoard = getBoard();
             for (ChessMove move : potentialMoves) {
@@ -113,6 +118,9 @@ public class ChessGame {
      *  or if it’s not the corresponding team's turn.
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (gameOver) {
+            throw new InvalidMoveException("Error: the game is over");
+        }
         ChessPiece myPiece = game.getPiece(move.getStartPosition());
         if (myPiece != null) {
             if (myPiece.getTeamColor() == getTeamTurn()) { //throws an error if the move is made on the wrong turn
@@ -192,6 +200,7 @@ public class ChessGame {
                 okMoves.addAll(validMoves(piece));
             }
             if (okMoves.size() == 0) {
+                gameOver = true;
                 return true;
             }
         }
@@ -213,6 +222,7 @@ public class ChessGame {
             okMoves.addAll(validMoves(piece));
         }
         if (okMoves.size() == 0) {
+            gameOver = true;
             return true;
         };
         return false;
