@@ -28,6 +28,16 @@ public class GameService {
         return gamesList;
     }
 
+    /**
+     * @param gameID
+     * @return the ChessGame object for the given gameID
+     * @throws DataAccessException
+     */
+    public ChessGame getGame(Integer gameID) throws DataAccessException {
+        GameData game = dataAccess.getGameData(gameID);
+        return game.game();
+    }
+
     public Integer gameCreator(GameData game) throws DataAccessException {
         game = dataAccess.addGame(game);
         return game.gameID();
