@@ -39,7 +39,22 @@ public class ChessMove {
 
     @Override
     public String toString() { 
-        return "[start{" + startPosition + "}, end{" + endPosition + "}]"; //, promotionPiece=" + promotionPiece;
+        return String.format("%s%d%s%d", colToAlpha(startPosition.getColumn()), startPosition.getRow(),
+                colToAlpha(endPosition.getColumn()), endPosition.getRow());
+    }
+
+    private String colToAlpha(Integer col) {
+        return switch(col) {
+            case 1 -> "a";
+            case 2 -> "b";
+            case 3 -> "c";
+            case 4 -> "d";
+            case 5 -> "e";
+            case 6 -> "f";
+            case 7 -> "g";
+            case 8 -> "h";
+            default -> "?";
+        };
     }
 
     /**
