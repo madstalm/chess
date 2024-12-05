@@ -18,6 +18,7 @@ public class Client {
     private boolean playingGame = false;
     private boolean observingGame = false;
     private ChessGame currentGame;
+    private Integer currentGameID;
     private ChessGame.TeamColor currentTeam;
     /**
      * stores localID as key, GameData as value.
@@ -187,7 +188,7 @@ public class Client {
         }
     }
 
-    public void playGame(String... params) throws ClientException {
+    public String playGame(String... params) throws ClientException {
         assertLoggedIn();
         if ((playingGame)||(observingGame)) {
             return help();
@@ -200,17 +201,23 @@ public class Client {
                 GameData game = gamesMap.get(gameNumber);
                 try {
                     JoinGameRequest request = new JoinGameRequest(null, game.gameID());
-                    DrawBoard artist = new DrawBoard(new ChessGame());
                     playingGame = true;
+                    currentGameID = game.gameID();
                     if (params[1].matches("(?i)\\s*white\\s*")) {
                         request = request.setPlayerColor(ChessGame.TeamColor.WHITE);
+                        currentTeam = ChessGame.TeamColor.WHITE;
                         server.joinGame(request, token);
-                        return artist.display(ChessGame.TeamColor.WHITE) + "\n\n" + help();
+                        ws = new WebSocketFacade(serverUrl, serverMessageHandler);
+                        ws.connect(token.authToken(), game.gameID());
+                        return "\n";
                     }
                     else  if (params[1].matches("(?i)\\s*black\\s*")){
                         request = request.setPlayerColor(ChessGame.TeamColor.BLACK);
+                        currentTeam = ChessGame.TeamColor.BLACK;
                         server.joinGame(request, token);
-                        return artist.display(ChessGame.TeamColor.BLACK) + "\n\n" + help();
+                        ws = new WebSocketFacade(serverUrl, serverMessageHandler);
+                        ws.connect(token.authToken(), game.gameID());
+                        return "\n";
                     }
                     else {
                         throw new ClientException("Unable to recognize team color");
@@ -238,9 +245,9 @@ public class Client {
                 GameData game = gamesMap.get(gameNumber);
                 if (game != null) {
                     observingGame = true;
-                    
-                    DrawBoard artist = new DrawBoard(new ChessGame());
-                    return artist.display(ChessGame.TeamColor.WHITE) + "\n\n" + help();
+                    ws = new WebSocketFacade(serverUrl, serverMessageHandler);
+                    ws.connect(token.authToken(), game.gameID());
+                    return "\n";
                 }
                 throw new ClientException(String.format("Game %s does not exist", gameNumber));
             }
@@ -251,7 +258,7 @@ public class Client {
 
     public String quit() throws ClientException {
         if ((playingGame)||(observingGame)) {
-            return help();
+            return "you must leave the game first\n" + help();
         }
         try {
             if (loggedIn == true) {
@@ -268,14 +275,13 @@ public class Client {
 
     //redrawBoard - legalMoves could be called in some kind of WebsocketHandler class, which will do most of the implementation
     //they exist in client so that they can have access to variables like loggedIn, playingGame, etc.
-
-    //could be called as the final step in playGame() and observeGame()
     public String redrawBoard() throws ClientException {
         assertLoggedIn();
         if ((playingGame == false)&&(observingGame == false)) {
             return help();
         }
-        return "Error: not implemented";
+        DrawBoard artist = new DrawBoard(currentGame);
+        return artist.display(getPlayerColor());
     }
 
     public String leave() throws ClientException {
@@ -283,10 +289,15 @@ public class Client {
         if ((playingGame == false)&&(observingGame == false)) {
             return help();
         }
-
+        ws.leave(token.authToken(), currentGameID);
+        Integer localGameID = gamesIDs.get(currentGameID);
+        currentGame = null;
+        currentGameID = null;
+        currentTeam = null;
+        ws = null;
         playingGame = false;
         observingGame = false;
-        return "Error: not implemented";
+        return String.format("left game %d", localGameID);
     }
 
     public String makeMove(String... params) throws ClientException {
@@ -294,7 +305,20 @@ public class Client {
         if (playingGame == false) {
             return help();
         }
-        return "Error: not implemented";
+        ChessMove move;
+        if (params.length == 1) {
+            move = validateMoveString(params[0], null);
+            ws.makeMove(token.authToken(), currentGameID, move);
+            return "\n";
+        }
+        else if (params.length == 2) {
+            move = validateMoveString(params[0], params[1]);
+            ws.makeMove(token.authToken(), currentGameID, move);
+            return "\n";
+        }
+        else {
+            throw new ClientException("Error: incorrect input");
+        }
     }
 
     public String resign() throws ClientException {
@@ -302,8 +326,8 @@ public class Client {
         if (playingGame == false) {
             return help();
         }
-
-        return "Error: not implemented";
+        ws.resign(token.authToken(), currentGameID);
+        return "\n";
     }
 
     //could be nearly the same as redrawBoard(), but with some kind of array passed in
@@ -329,7 +353,7 @@ public class Client {
                     - help
                     - redrawBoard
                     - Leave
-                    - makeMove <origin:(a-h)(1-8)><destination:(a-h)(1-8)> [ex. "makeMove d1a4"]
+                    - makeMove <origin:(a-h)(1-8)><destination:(a-h)(1-8)> <promotion piece if applicable> [ex. "makeMove d1a4"]
                     - resign
                     - legalMoves <(a-h)(1-8)>
                     """;
@@ -385,4 +409,55 @@ public class Client {
             return ChessGame.TeamColor.WHITE;
         }
     }
+
+    public void setGame(ChessGame game) {
+        currentGame = game;
+    }
+
+    private ChessMove validateMoveString(String inputMove, String inputPromotion) throws ClientException {
+        if (inputMove.matches("^[a-h][1-8][a-h][1-8]$")) {
+            ChessPosition start = new ChessPosition(Integer.parseInt(inputMove.substring(1, 2)),
+                    alphaToCol(inputMove.substring(0, 1)));
+            ChessPosition end = new ChessPosition(Integer.parseInt(inputMove.substring(inputMove.length() - 1)),
+                    alphaToCol(inputMove.substring(2, 3)));
+            ChessPiece.PieceType promotionPiece = null;
+            if (inputPromotion != null) {
+                promotionPiece = strToPiece(inputPromotion);
+            }
+            return new ChessMove(start, end, promotionPiece);
+        }
+        else {
+            throw new ClientException("Error: incorrect input");
+        }
+    }
+
+    private Integer alphaToCol(String alpha) throws ClientException {
+        return switch(alpha) {
+            case "a" -> 1;
+            case "b" -> 2;
+            case "c" -> 3;
+            case "d" -> 4;
+            case "e" -> 5;
+            case "f" -> 6;
+            case "g" -> 7;
+            case "h" -> 8;
+            default -> throw new ClientException("Error: attempted to move off the board");
+        };
+    }
+
+    private ChessPiece.PieceType strToPiece(String input) throws ClientException {
+        switch (input) {
+            case "queen":
+                return ChessPiece.PieceType.QUEEN;
+            case "bishop":
+                return ChessPiece.PieceType.BISHOP;
+            case "knight":
+                return ChessPiece.PieceType.KNIGHT;
+            case "rook":
+                return ChessPiece.PieceType.ROOK;
+            default:
+                throw new ClientException("Error: " + input + " is not a valid chess piece promotion");
+        }
+    }
+
 }

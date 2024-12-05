@@ -41,25 +41,6 @@ public class WebSocketHandler {
     }
 
     private void connect(UserGameCommand command, Session session) throws Exception {
-        //I need to validate that the ConnectCommand class is kosher with the tests and stuff
-        // ***update***, this method no longer uses ConnectCommand. I will need to get rid of the old code and delete the class before I submit
-        /*
-        ConnectCommand command = new Gson().fromJson(message, ConnectCommand.class);
-        try {
-            AuthData authData = authService.checkAuth(command.getAuthToken());
-            connections.add(authData.authToken(), command.getGameID(), session);
-            String sendMessage = "";
-            if (command.getTeamColor() == null) { //an observer has joined
-                sendMessage = String.format("%s has joined the game as observer", authData.username());
-            }
-            else { //a player has joined
-                sendMessage = String.format("%s has joined the game as %s", authData.username(), command.getTeamColorString());
-            }
-            var notification = new NotificationMessage(ServerMessageType.NOTIFICATION, sendMessage);
-            connections.broadcastUser(authData.authToken(), findLoadGame(command.getGameID()));
-            connections.broadcast(authData.authToken(), command.getGameID(), notification);
-        }
-        */
         try {
             AuthData authData = authService.checkAuth(command.getAuthToken());
             connections.add(authData.authToken(), command.getGameID(), session);

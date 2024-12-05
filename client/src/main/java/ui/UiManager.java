@@ -4,10 +4,6 @@ import java.util.Scanner;
 import websocket.messages.*;
 import com.google.gson.Gson;
 
-import chess.ChessGame;
-
-import javax.management.Notification;
-
 import static ui.EscapeSequences.*;
 
 public class UiManager implements ServerMessageHandler {
@@ -56,6 +52,7 @@ public class UiManager implements ServerMessageHandler {
                 System.out.println(SET_TEXT_COLOR_RED + errorMessage.getErrorMessage());
             case LOAD_GAME:
                 LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
+                client.setGame(loadGame.getChessGame());
                 DrawBoard artist = new DrawBoard(loadGame.getChessGame());
                 System.out.print(artist.display(client.getPlayerColor()) + "\n");
         }
