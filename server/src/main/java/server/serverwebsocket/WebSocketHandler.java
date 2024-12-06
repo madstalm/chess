@@ -138,9 +138,13 @@ public class WebSocketHandler {
                 GameData updatedGame = game;
                 switch (player.playerColor()) {
                     case WHITE:
-                        updatedGame = new GameData(game.gameID(), null, game.blackUsername(), game.gameName(), game.game());
+                        updatedGame = new GameData(game.gameID(), null, game.blackUsername(),
+                                game.gameName(), game.game());
+                        break;
                     case BLACK:
-                        updatedGame = new GameData(game.gameID(), game.whiteUsername(), null, game.gameName(), game.game());
+                        updatedGame = new GameData(game.gameID(), game.whiteUsername(), null,
+                                game.gameName(), game.game());
+                        break;
                 }
                 gameService.updateGameData(updatedGame);
             }

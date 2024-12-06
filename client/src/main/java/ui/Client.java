@@ -446,18 +446,13 @@ public class Client {
     }
 
     private ChessPiece.PieceType strToPiece(String input) throws ClientException {
-        switch (input) {
-            case "queen":
-                return ChessPiece.PieceType.QUEEN;
-            case "bishop":
-                return ChessPiece.PieceType.BISHOP;
-            case "knight":
-                return ChessPiece.PieceType.KNIGHT;
-            case "rook":
-                return ChessPiece.PieceType.ROOK;
-            default:
-                throw new ClientException("Error: " + input + " is not a valid chess piece promotion");
-        }
+        return switch (input) {
+            case "queen" -> ChessPiece.PieceType.QUEEN;
+            case "bishop" -> ChessPiece.PieceType.BISHOP;
+            case "knight" -> ChessPiece.PieceType.KNIGHT;
+            case "rook" -> ChessPiece.PieceType.ROOK;
+            default -> throw new ClientException("Error: " + input + " is not a valid chess piece promotion");
+        };
     }
 
 }
