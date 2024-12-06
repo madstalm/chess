@@ -228,6 +228,9 @@ public class Client {
                     }
                 }
                 catch (Exception e) {
+                    playingGame = false;
+                    currentGameID = null;
+                    currentTeam = null;
                     throw new ClientException(String.format("Failed to join game %s", gameNumber));
                 }
             }
@@ -254,6 +257,8 @@ public class Client {
                     ws.connect(token.authToken(), game.gameID());
                     return "\n";
                 }
+                observingGame = false;
+                currentGameID = null;
                 throw new ClientException(String.format("Game %s does not exist", gameNumber));
             }
             throw new ClientException("<game number> should be an integer");

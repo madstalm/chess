@@ -231,8 +231,11 @@ public class WebSocketHandler {
         return new PlayerData(playerUsername, gameID, playerColor, opponent, opponentColor);
     }
 
-    private void checkPiece(ChessPosition start, ChessGame.TeamColor playerColor, ChessGame game) throws UnauthorizedException {
+    private void checkPiece(ChessPosition start, ChessGame.TeamColor playerColor, ChessGame game) throws Exception {
         ChessPiece movingPiece = game.getBoard().getPiece(start);
+        if (movingPiece == null) {
+            throw new InvalidMoveException("no piece at start position");
+        }
         if (playerColor == null) {
             throw new UnauthorizedException("Error: non-player attempted to move piece");
         }
