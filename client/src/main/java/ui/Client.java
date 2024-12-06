@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Scanner;
+import static ui.EscapeSequences.*;
 
 import com.google.gson.Gson;
 
@@ -60,7 +62,7 @@ public class Client {
                 case "redrawboard" -> redrawBoard();
                 case "leave" -> leave();
                 case "makemove" -> makeMove(params);
-                case "resign" -> resign();
+                case "resign" -> resign(params);
                 case "legalmoves" -> legalMoves(params);
                 case "quit" -> quit();
                 default -> help();
@@ -247,6 +249,7 @@ public class Client {
                 GameData game = gamesMap.get(gameNumber);
                 if (game != null) {
                     observingGame = true;
+                    currentGameID = gameNumber;
                     ws = new WebSocketFacade(serverUrl, serverMessageHandler);
                     ws.connect(token.authToken(), game.gameID());
                     return "\n";
@@ -323,13 +326,21 @@ public class Client {
         }
     }
 
-    public String resign() throws ClientException {
+    public String resign(String... params) throws ClientException {
         assertLoggedIn();
-        if (playingGame == false) {
+        if (!playingGame) {
             return help();
         }
-        ws.resign(token.authToken(), currentGameID);
-        return "\n";
+        if (params.length == 1) {
+            if (params[0].equals("y")) {
+                ws.resign(token.authToken(), currentGameID);
+                return "\n";
+            }
+            else {
+                return "resignation declined\n";
+            }
+        }
+        throw new ClientException("Error: no confirmation provided");
     }
 
     //could be nearly the same as redrawBoard(), but with some kind of array passed in
@@ -370,7 +381,7 @@ public class Client {
                     - redrawBoard
                     - Leave
                     - makeMove <origin:(a-h)(1-8)><destination:(a-h)(1-8)> <promotion piece if applicable> [ex. "makeMove d1a4"]
-                    - resign
+                    - resign <y|n>
                     - legalMoves <(a-h)(1-8)>
                     """;
         }

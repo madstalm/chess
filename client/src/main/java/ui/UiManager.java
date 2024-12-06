@@ -48,14 +48,20 @@ public class UiManager implements ServerMessageHandler {
             case NOTIFICATION:
                 NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
                 System.out.println(SET_TEXT_COLOR_BLUE + notification.getNotification());
+                break;
             case ERROR:
                 ErrorMessage errorMessage = new Gson().fromJson(message, ErrorMessage.class);
                 System.out.println(SET_TEXT_COLOR_RED + errorMessage.getErrorMessage());
+                break;
             case LOAD_GAME:
                 LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
                 client.setGame(loadGame.getChessGame());
                 DrawBoard artist = new DrawBoard(loadGame.getChessGame(), new ArrayList<>());
                 System.out.print(artist.display(client.getPlayerColor()) + "\n");
+                break;
+            default:
+                System.out.println("Error: unexpected message behavior");
+                break;
         }
         printPrompt();
     }
