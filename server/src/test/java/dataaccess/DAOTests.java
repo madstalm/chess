@@ -56,8 +56,8 @@ public class DAOTests {
         userDAO.deleteAllUsers();
         Assertions.assertEquals(null, authDAO.getAuthData("123"),
                 "authDao was not cleared");
-        Assertions.assertEquals(null, gameDAO.getGameData(1),
-                "gameDao was not cleared");
+        assertThrows(Exception.class,
+                () -> gameDAO.getGameData(1));
         Assertions.assertEquals(null, userDAO.getUserData("bob"),
                 "userDao was not cleared");
     }
@@ -200,8 +200,8 @@ public class DAOTests {
     public void getGameN() throws Exception {
         GameData game = new GameData(null, null, null, "the Game", null);
         game = gameDAO.addGame(game);
-        Assertions.assertEquals(null, gameDAO.getGameData(2),
-                "gameDao retrieved gameData that shouldn't exist");
+        assertThrows(Exception.class,
+                () -> gameDAO.getGameData(2));
         Assertions.assertEquals(game, gameDAO.getGameData(game.gameID()),
                 "gameDao retrieved wrong game"); 
     }
