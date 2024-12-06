@@ -40,7 +40,7 @@ public class SQLGameDAO implements GameDAO {
         } catch (Exception ex) {
             throw new DataAccessException("Error: " + ex.getMessage());
         }
-        return null;
+        throw new DataAccessException("no game object found a query id");
     }
 
     public Collection<GameData> listGames() throws DataAccessException {

@@ -74,6 +74,10 @@ public class ChessGame {
         gameOver = true;
     }
 
+    public boolean gameFinished() {
+        return gameOver;
+    }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */
