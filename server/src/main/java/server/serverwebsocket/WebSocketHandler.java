@@ -93,7 +93,7 @@ public class WebSocketHandler {
             //handler updates to game state
             if (game.isInCheckmate(player.opponentColor())) {
                 NotificationMessage checkmateMessage = new NotificationMessage(ServerMessageType.NOTIFICATION,
-                        String.format("congratulations %s player %s, %s player %s is in check",
+                        String.format("congratulations %s player %s, %s player %s is in checkmate",
                         player.playerColor().toString(), player.username(), player.opponentColor().toString(), player.opponent()));
                 connections.broadcastUser(authData.authToken(), checkmateMessage);
                 connections.broadcast(authData.authToken(), command.getGameID(), checkmateMessage);
