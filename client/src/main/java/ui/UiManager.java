@@ -1,5 +1,6 @@
 package ui;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 import websocket.messages.*;
 import com.google.gson.Gson;
@@ -53,7 +54,7 @@ public class UiManager implements ServerMessageHandler {
             case LOAD_GAME:
                 LoadGameMessage loadGame = new Gson().fromJson(message, LoadGameMessage.class);
                 client.setGame(loadGame.getChessGame());
-                DrawBoard artist = new DrawBoard(loadGame.getChessGame());
+                DrawBoard artist = new DrawBoard(loadGame.getChessGame(), new ArrayList<>());
                 System.out.print(artist.display(client.getPlayerColor()) + "\n");
         }
         printPrompt();

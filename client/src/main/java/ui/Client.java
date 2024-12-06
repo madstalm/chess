@@ -3,6 +3,8 @@ import model.*;
 import chess.*;
 
 import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -280,7 +282,7 @@ public class Client {
         if ((playingGame == false)&&(observingGame == false)) {
             return help();
         }
-        DrawBoard artist = new DrawBoard(currentGame);
+        DrawBoard artist = new DrawBoard(currentGame, new ArrayList<>());
         return artist.display(getPlayerColor());
     }
 
@@ -336,7 +338,21 @@ public class Client {
         if ((playingGame == false)&&(observingGame == false)) {
             return help();
         }
-        return "Error: not implemented";
+        ChessPosition position;
+        if (params.length == 1) {
+            position = validatePositionString(params[0]);
+            Collection<ChessMove> moves = currentGame.validMoves(position);
+            ArrayList<ChessPosition> positions = new ArrayList<>();
+            for (ChessMove move : moves) {
+                positions.add(move.getEndPosition());
+            }
+            positions.add(position);
+            DrawBoard artist = new DrawBoard(currentGame, positions);
+            return artist.display(getPlayerColor());
+        }
+        else {
+            throw new ClientException("Error: incorrect input");
+        }
     }
 
     public String help() {
@@ -425,6 +441,17 @@ public class Client {
                 promotionPiece = strToPiece(inputPromotion);
             }
             return new ChessMove(start, end, promotionPiece);
+        }
+        else {
+            throw new ClientException("Error: incorrect input");
+        }
+    }
+
+    private ChessPosition validatePositionString(String inputPosition) throws ClientException {
+        if (inputPosition.matches("^[a-h][1-8]$")) {
+            ChessPosition start = new ChessPosition(Integer.parseInt(inputPosition.substring(inputPosition.length() - 1)),
+                    alphaToCol(inputPosition.substring(0, 1)));
+            return start;
         }
         else {
             throw new ClientException("Error: incorrect input");

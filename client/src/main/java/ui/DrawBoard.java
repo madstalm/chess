@@ -1,4 +1,5 @@
 package ui;
+import java.util.ArrayList;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -13,6 +14,7 @@ import chess.ChessPosition;
 public class DrawBoard {
     private static ChessGame game;
     private static ChessBoard board;
+    private static ArrayList<ChessPosition> legalMoves;
 
     // Board dimensions.
     private static final int BOARD_SIZE_IN_SQUARES = 8;
@@ -26,9 +28,10 @@ public class DrawBoard {
     private static final String R = " R ";
     private static final String P = " P ";
 
-    public DrawBoard(ChessGame chessGame) {
+    public DrawBoard(ChessGame chessGame, ArrayList<ChessPosition> moves) {
         game = chessGame;
         board = game.getBoard();
+        legalMoves = moves;
     }
 
     public String display(ChessGame.TeamColor pov) {
@@ -39,17 +42,11 @@ public class DrawBoard {
 
         switch (pov) {
             case WHITE:
-                drawAlphaHeaders(out, true);
-                drawMiddle(out, true);
-                drawAlphaHeaders(out, true);
                 drawAlphaHeaders(out, false);
                 drawMiddle(out, false);
                 drawAlphaHeaders(out, false);
                 break;
             case BLACK:
-                drawAlphaHeaders(out, false);
-                drawMiddle(out, false);
-                drawAlphaHeaders(out, false); 
                 drawAlphaHeaders(out, true);
                 drawMiddle(out, true);
                 drawAlphaHeaders(out, true);
@@ -124,23 +121,35 @@ public class DrawBoard {
         }
         if (flip) {
             for (int boardCol = BOARD_SIZE_IN_SQUARES; boardCol >= 1; --boardCol) {
-                drawSquare(out, boardCol, colors, row);
+                ChessPosition currentSquare = new ChessPosition(row, boardCol);
+                drawSquare(out, boardCol, colors, row, legalMoves.contains(currentSquare));
             }
         }
         else {
             for (int boardCol = 1; boardCol <= BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                drawSquare(out, boardCol, colors, row);
+                ChessPosition currentSquare = new ChessPosition(row, boardCol);
+                drawSquare(out, boardCol, colors, row, legalMoves.contains(currentSquare));
             }
         }
         setBlack(out);
     }
 
-    private static void drawSquare(PrintWriter out, int boardCol, boolean[] colors, int row) {
+    private static void drawSquare(PrintWriter out, int boardCol, boolean[] colors, int row, boolean legal) {
         if (colors[boardCol-1]) {
-            out.print(SET_BG_COLOR_LIGHT_GREY);
+            if (legal) {
+                out.print(SET_BG_COLOR_YELLOW);
+            }
+            else {
+                out.print(SET_BG_COLOR_LIGHT_GREY);
+            }
         }
         else {
-            out.print(SET_BG_COLOR_LIGHT_BLUE);
+            if (legal) {
+                out.print(SET_BG_COLOR_GREEN);
+            }
+            else {
+                out.print(SET_BG_COLOR_LIGHT_BLUE);
+            }
         }
         ChessPiece currentPiece = board.getPiece(new ChessPosition(row, boardCol));
         if (currentPiece == null) {
